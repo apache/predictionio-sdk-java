@@ -87,7 +87,6 @@ public class PredictionIO {
             public APIResponse onCompleted() throws Exception {
                 Response r = builder.build();
                 return new APIResponse(r.getStatusCode(), r.getResponseBody());
-                //TODO Close async connection to free up threads
             }
         };
     }
