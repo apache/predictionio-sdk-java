@@ -1,4 +1,4 @@
-package com.tappingstone.predictionio;
+package io.prediction;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -16,17 +16,19 @@ import java.util.Date;
  * The PredictionIO Java class is a full feature abstraction on top of the RESTful PredictionIO web interface.
  *
  * @author TappingStone (help@tappingstone.com)
- * @version 1.0
- * @since 1.0
+ * @version 0.2
+ * @since 0.2
  */
 public class PredictionIO {
     private static Logger logger = Logger.getLogger(PredictionIO.class);
     // API base URL constant string
-    private final String apiUrl = "https://predictionio.com/v1";
+    private final String defaultApiUrl = "http://localhost:8000";
     private final String apiFormat = "json";
     // HTTP status code
     private final int HTTP_OK = 200;
     private final int HTTP_CREATED = 201;
+    //API Url
+    private String apiUrl;
     // Appkey
     private String appkey;
     // Async HTTP client
@@ -35,6 +37,7 @@ public class PredictionIO {
 
     public PredictionIO(String appkey) {
         this.setAppkey(appkey);
+        this.apiUrl = defaultApiUrl;
 
         // Async HTTP client config
         this.config = (new AsyncHttpClientConfig.Builder())
@@ -48,7 +51,32 @@ public class PredictionIO {
         this.client = new AsyncHttpClient(new NettyAsyncHttpProvider(config));
     }
 
-    public PredictionIO(String appkey, int threadLimit) {
+    public PredictionIO(String appkey, String apiURL) {
+        this.setAppkey(appkey);
+        if (apiURL != null) {
+            this.apiUrl = apiURL;
+        } else {
+            this.apiUrl = defaultApiUrl;
+        }
+
+        // Async HTTP client config
+        this.config = (new AsyncHttpClientConfig.Builder())
+                .setAllowPoolingConnection(true)
+                .setAllowSslConnectionPool(true)
+                .addRequestFilter(new ThrottleRequestFilter(100))
+                .setMaximumConnectionsPerHost(100)
+                .setRequestTimeoutInMs(5000)
+                .setIOThreadMultiplier(100)
+                .build();
+        this.client = new AsyncHttpClient(new NettyAsyncHttpProvider(config));
+    }
+
+    public PredictionIO(String appkey, String apiURL, int threadLimit) {
+        if (apiURL != null) {
+            this.apiUrl = apiURL;
+        } else {
+            this.apiUrl = defaultApiUrl;
+        }
         this.setAppkey(appkey);
         // Async HTTP client config
         this.config = (new AsyncHttpClientConfig.Builder())

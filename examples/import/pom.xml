@@ -6,7 +6,7 @@
         <groupId>com.tappingstone</groupId>
         <artifactId>predictionio</artifactId>
         <relativePath>../../pom.xml</relativePath>
-        <version>1.0-SNAPSHOT</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>import</artifactId>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>com.tappingstone</groupId>
             <artifactId>predictionio-java</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

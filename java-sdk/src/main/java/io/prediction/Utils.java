@@ -1,11 +1,11 @@
-package com.tappingstone.predictionio;
+package io.prediction;
 
 /**
  * Utility class for PredictionIO Java SDK
  *
  * @author TappingStone (help@tappingstone.com)
- * @version 1.0
- * @since 1.0
+ * @version 0.2
+ * @since 0.2
  */
 
 public class Utils {

@@ -1,4 +1,4 @@
-package com.tappingstone.predictionio;
+package io.prediction;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -9,8 +9,8 @@ import java.util.concurrent.TimeoutException;
  * TappingStone implementation of Java Utility Concurrent Future
  *
  * @author TappingStone (help@tappingstone.com)
- * @version 1.0
- * @since 1.0
+ * @version 0.2
+ * @since 0.2
  */
 
 public class FutureAPIResponse implements Future {

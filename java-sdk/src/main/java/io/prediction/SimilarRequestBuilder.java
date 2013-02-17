@@ -1,4 +1,4 @@
-package com.tappingstone.predictionio;
+package io.prediction;
 
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -7,8 +7,8 @@ import com.ning.http.client.RequestBuilder;
  * Class to build Similar Requests
  *
  * @author TappingStone (help@tappingstone.com)
- * @version 1.0
- * @since 1.0
+ * @version 0.2
+ * @since 0.2
  */
 
 public class SimilarRequestBuilder {

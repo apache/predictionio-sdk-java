@@ -1,4 +1,4 @@
-package com.tappingstone.predictionio;
+package io.prediction;
 
 import java.util.Date;
 
@@ -6,8 +6,8 @@ import java.util.Date;
  * Item class for PredictionIO item objects
  *
  * @author TappingStone (help@tappingstone.com)
- * @version 1.0
- * @since 1.0
+ * @version 0.2
+ * @since 0.2
  */
 
 public class Item {

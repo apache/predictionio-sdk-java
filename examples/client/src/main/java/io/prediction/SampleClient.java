@@ -1,4 +1,4 @@
-package com.tappingstone.predictionio.examples.client;
+package io.prediction;
 
 import com.tappingstone.predictionio.*;
 
