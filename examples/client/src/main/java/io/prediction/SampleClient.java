@@ -1,9 +1,8 @@
 package io.prediction;
 
-import com.tappingstone.predictionio.*;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,7 +12,7 @@ import java.util.Date;
  */
 public class SampleClient {
     public static void main(String[] args) {
-        PredictionIO predictionIO = new PredictionIO("145s436ni365033v1w4z4s6tz1i");
+        PredictionIO predictionIO = new PredictionIO("6ztw3ty3P1Pgqj4cOPXdTUlSR6ZAYQNhNdYAfWb77LfnfrbBZDex58hcb3e4ehIt");
         try {
             // Get API system status
             System.out.println(predictionIO.getStatus().getMessage());
@@ -42,7 +41,7 @@ public class SampleClient {
 
             System.out.print("Create dummy female user with uid barbaz with latlng: ");
             CreateUserRequestBuilder builder = predictionIO.getCreateUserRequestBuilder("barbaz");
-            builder.latitude(21.109).longitude(-48.7479).gender("F");
+            builder.latitude(21.109).longitude(-48.7479);
             if (predictionIO.createUser(builder)) {
                 System.out.println("succeeded");
             } else {
@@ -53,7 +52,6 @@ public class SampleClient {
             User user = predictionIO.getUser("barbaz");
             if (user != null) {
                 System.out.println("       uid: " + user.getUid());
-                System.out.println("    gender: " + user.getGender());
                 System.out.println("       lat: " + user.getLatitude());
                 System.out.println("       lng: " + user.getLongitude());
                 System.out.println("   created: " + user.getCreated());
@@ -76,7 +74,7 @@ public class SampleClient {
             itypes[1] = 8;
             CreateItemRequestBuilder ibuilder = predictionIO.getCreateItemRequestBuilder("barbaz", itypes);
             long ts = 478308922;
-            Date startT = new Date(ts);
+            DateTime startT = new DateTime(ts);
             ibuilder.startT(startT).latitude(-58.24089).longitude(48.17890);
             if (predictionIO.createItem(ibuilder)) {
                 System.out.println("succeeded");

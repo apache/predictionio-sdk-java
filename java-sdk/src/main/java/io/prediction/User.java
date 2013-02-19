@@ -1,6 +1,6 @@
 package io.prediction;
 
-import java.util.Date;
+import org.joda.time.DateTime;
 
 /**
  * User class for PredictionIO User objects
@@ -12,25 +12,13 @@ import java.util.Date;
 
 public class User {
     private String uid;
-    private String gender;
-    private Date bday;
     private Double latitude;
     private Double longitude;
-    private Date created;
-    private Date modified;
+    private DateTime created;
+    private DateTime modified;
 
     public User(String uid) {
         this.uid = uid;
-    }
-
-    public User gender(String gender) {
-        this.gender = gender;
-        return this;
-    }
-
-    public User bday(Date bday) {
-        this.bday = bday;
-        return this;
     }
 
     public User latitude(Double latitude) {
@@ -43,26 +31,18 @@ public class User {
         return this;
     }
 
-    public User created(Date created) {
+    public User created(DateTime created) {
         this.created = created;
         return this;
     }
 
-    public User modified(Date modified) {
+    public User modified(DateTime modified) {
         this.modified = modified;
         return this;
     }
 
     public String getUid() {
         return this.uid;
-    }
-
-    public String getGender() {
-        return this.gender;
-    }
-
-    public Date getBday() {
-        return this.bday;
     }
 
     public Double getLatitude() {
@@ -73,11 +53,11 @@ public class User {
         return this.longitude;
     }
 
-    public Date getCreated() {
+    public DateTime getCreated() {
         return this.created;
     }
 
-    public Date getModified() {
+    public DateTime getModified() {
         return this.modified;
     }
 }

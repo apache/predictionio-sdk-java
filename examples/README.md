@@ -9,7 +9,7 @@ First edit the class files to replace the API Keys and API Urls with your test s
 To build these examples you'll need Maven 3.x.x and run in the root directory (ie: the directory you initially
 checked the SDK in or within each examples main directory):
 
-            mvn clean install
+            mvn clean package
 
 Usage
 --------

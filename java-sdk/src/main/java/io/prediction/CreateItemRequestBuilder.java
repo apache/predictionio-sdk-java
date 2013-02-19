@@ -2,8 +2,7 @@ package io.prediction;
 
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-
-import java.util.Date;
+import org.joda.time.DateTime;
 
 /**
  * Class to build Item requests
@@ -21,8 +20,8 @@ public class CreateItemRequestBuilder {
     private int[] itypes;
     private Double latitude;
     private Double longitude;
-    private Date startT;
-    private Date endT;
+    private DateTime startT;
+    private DateTime endT;
 
     public CreateItemRequestBuilder(String apiUrl, String apiFormat, String appkey, String iid, int[] itypes) {
         this.apiUrl = apiUrl;
@@ -42,12 +41,12 @@ public class CreateItemRequestBuilder {
         return this;
     }
 
-    public CreateItemRequestBuilder startT(Date startT) {
+    public CreateItemRequestBuilder startT(DateTime startT) {
         this.startT = startT;
         return this;
     }
 
-    public CreateItemRequestBuilder endT(Date endT) {
+    public CreateItemRequestBuilder endT(DateTime endT) {
         this.endT = endT;
         return this;
     }
@@ -62,10 +61,10 @@ public class CreateItemRequestBuilder {
             builder.addQueryParameter("latlng", this.latitude.toString() + "," + this.longitude.toString());
         }
         if (this.startT != null) {
-            builder.addQueryParameter("startT", Long.toString(this.startT.getTime()));
+            builder.addQueryParameter("startT", startT.toString());
         }
         if (this.endT != null) {
-            builder.addQueryParameter("endT", Long.toString(this.endT.getTime()));
+            builder.addQueryParameter("endT", endT.toString());
         }
         return builder.build();
     }

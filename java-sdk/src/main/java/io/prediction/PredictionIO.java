@@ -8,6 +8,7 @@ import com.ning.http.client.*;
 import com.ning.http.client.extra.ThrottleRequestFilter;
 import com.ning.http.client.providers.netty.NettyAsyncHttpProvider;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.Date;
@@ -200,11 +201,11 @@ public class PredictionIO {
                 JsonObject messageAsJson = (JsonObject) parser.parse(message);
                 String uid = messageAsJson.get("uid").getAsString();
                 User user = new User(uid);
-                user.created(new Date(messageAsJson.get("ct").getAsLong()));
+                user.created(new DateTime(messageAsJson.get("ct").getAsLong()));
                 //Check values
                 try {
                     if (messageAsJson.get("mt") != null) {
-                        user.modified(new Date(messageAsJson.get("mt").getAsLong()));
+                        user.modified(new DateTime(messageAsJson.get("mt").getAsLong()));
                     }
                 } catch (ClassCastException cce) {
                     if (logger.isDebugEnabled()) {
@@ -214,36 +215,6 @@ public class PredictionIO {
                 } catch (Exception e) {
                     if (logger.isDebugEnabled()) {
                         logger.error("Exception occurred trying to get mt");
-                        logger.error(e.getMessage());
-                    }
-                }
-                try {
-                    if (messageAsJson.get("gender") != null) {
-                        user.gender(messageAsJson.get("gender").getAsString());
-                    }
-                } catch (ClassCastException cce) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("ClassCastException occurred trying to get gender");
-                        logger.error(cce.getMessage());
-                    }
-                } catch (Exception e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("Exception occurred trying to get gender");
-                        logger.error(e.getMessage());
-                    }
-                }
-                try {
-                    if (messageAsJson.get("bday") != null) {
-                        user.bday(new Date(messageAsJson.get("bday").getAsLong()));
-                    }
-                } catch (ClassCastException cce) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("ClassCastException occurred trying to get bday");
-                        logger.error(cce.getMessage());
-                    }
-                } catch (Exception e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("Exception occurred trying to get bday");
                         logger.error(e.getMessage());
                     }
                 }
@@ -350,10 +321,10 @@ public class PredictionIO {
                 String iid = messageAsJson.get("iid").getAsString();
                 int[] itypes = this.jsonArrayAsIntArray(messageAsJson.getAsJsonArray("itypes"));
                 Item item = new Item(iid, itypes);
-                item.created(new Date(messageAsJson.get("ct").getAsLong()));
+                item.created(new DateTime(messageAsJson.get("ct").getAsLong()));
                 try {
                     if (messageAsJson.get("mt") != null) {
-                        item.modified(new Date(messageAsJson.get("mt").getAsLong()));
+                        item.modified(new DateTime(messageAsJson.get("mt").getAsLong()));
                     }
                 } catch (ClassCastException cce) {
                     if (logger.isDebugEnabled()) {

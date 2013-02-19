@@ -1,5 +1,7 @@
 package io.prediction;
 
+import org.joda.time.DateTime;
+
 import java.util.Date;
 
 /**
@@ -17,8 +19,8 @@ public class Item {
     private Date endT;
     private Double latitude;
     private Double longitude;
-    private Date created;
-    private Date modified;
+    private DateTime created;
+    private DateTime modified;
 
     public Item(String iid, int[] itypes) {
         this.iid = iid;
@@ -45,12 +47,12 @@ public class Item {
         return this;
     }
 
-    public Item created(Date created) {
+    public Item created(DateTime created) {
         this.created = created;
         return this;
     }
 
-    public Item modified(Date modified) {
+    public Item modified(DateTime modified) {
         this.modified = modified;
         return this;
     }
@@ -79,11 +81,11 @@ public class Item {
         return this.longitude;
     }
 
-    public Date getCreated() {
+    public DateTime getCreated() {
         return this.created;
     }
 
-    public Date getModified() {
+    public DateTime getModified() {
         return this.modified;
     }
 }

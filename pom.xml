@@ -20,16 +20,6 @@
         <module>java-sdk</module>
     </modules>
 
-    <profiles>
-        <profile>
-            <id>examples</id>
-            <modules>
-                <module>examples/client</module>
-                <module>examples/import</module>
-            </modules>
-        </profile>
-    </profiles>
-
     <build>
         <pluginManagement>
             <plugins>

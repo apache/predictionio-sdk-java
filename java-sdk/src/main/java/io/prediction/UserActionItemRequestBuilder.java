@@ -1,9 +1,8 @@
 package io.prediction;
 
-import java.util.Date;
-
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import org.joda.time.DateTime;
 
 /**
  * UserActionItem request builder
@@ -21,7 +20,7 @@ public class UserActionItemRequestBuilder {
     private int action;
     private String uid;
     private String iid;
-    private Date t;
+    private DateTime t;
 
     // Optional fields
     private Double latitude;
@@ -59,7 +58,7 @@ public class UserActionItemRequestBuilder {
         return this;
     }
 
-    public UserActionItemRequestBuilder t(Date t) {
+    public UserActionItemRequestBuilder t(DateTime t) {
         this.t = t;
         return this;
     }
@@ -73,7 +72,7 @@ public class UserActionItemRequestBuilder {
             builder.addQueryParameter("latlng", this.latitude.toString() + "," + this.longitude.toString());
         }
         if (this.t != null) {
-            builder.addQueryParameter("t", Long.toString(this.t.getTime()));
+            builder.addQueryParameter("t", t.toString());
         }
 
         String actionUrl = "";
