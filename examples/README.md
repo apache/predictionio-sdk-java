@@ -14,8 +14,19 @@ checked the SDK in or within each examples main directory):
 Usage
 --------
 
-Make sure you have added in your own API Key and URL into the files before compiling. Then just run the created JARs in
-the target directory to see sample output.
+Make sure you have added in your own API Key and URL into the files before compiling.
+
+For SampleImport, usage is as follows:
+
+        java -jar import-0.2-SNAPSHOT.jar {file you want to import}
+
+So for example, if we were to use the import.txt included in resources:
+
+        java -jar import-0.2-SNAPSHOT.jar ~/PredictionIO-Java-SDK/examples/import/src/main/resources/samples
+
+For SampleClient, usage is as follows:
+
+        java -jar client-0.2-SNAPSHOT.jar
 
 Support
 =========
