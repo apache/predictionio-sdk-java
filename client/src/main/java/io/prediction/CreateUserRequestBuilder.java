@@ -8,7 +8,7 @@ import com.ning.http.client.RequestBuilder;
  * Class to build User requests
  *
  * @author TappingStone (help@tappingstone.com)
- * @version 0.2
+ * @version 0.3
  * @since 0.2
  */
 

@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
  * Class to build Item requests
  *
  * @author TappingStone (help@tappingstone.com)
- * @version 0.2
+ * @version 0.3
  * @since 0.2
  */
 
@@ -17,13 +17,13 @@ public class CreateItemRequestBuilder {
     private String apiFormat;
     private String appkey;
     private String iid;
-    private int[] itypes;
+    private String[] itypes;
     private Double latitude;
     private Double longitude;
     private DateTime startT;
     private DateTime endT;
 
-    public CreateItemRequestBuilder(String apiUrl, String apiFormat, String appkey, String iid, int[] itypes) {
+    public CreateItemRequestBuilder(String apiUrl, String apiFormat, String appkey, String iid, String[] itypes) {
         this.apiUrl = apiUrl;
         this.apiFormat = apiFormat;
         this.appkey = appkey;

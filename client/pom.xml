@@ -3,16 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.tappingstone</groupId>
-        <artifactId>predictionio</artifactId>
+        <groupId>io.prediction</groupId>
+        <artifactId>sdk</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>predictionio-java</artifactId>
+    <artifactId>client</artifactId>
     <packaging>jar</packaging>
 
-    <name>PredictionIO: Java</name>
+    <name>PredictionIO Java SDK: Client</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

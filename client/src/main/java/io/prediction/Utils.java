@@ -9,11 +9,11 @@ package io.prediction;
  */
 
 public class Utils {
-    public static String itypesAsString(int[] itypes) {
+    public static String itypesAsString(String[] itypes) {
         StringBuilder sbuilder = new StringBuilder();
         int lastIdx = itypes.length - 1;
         for (int i = 0; i < itypes.length; i++) {
-            sbuilder.append(Integer.toString(itypes[i]));
+            sbuilder.append(itypes[i]);
             if (i != lastIdx) {
                 sbuilder.append(",");
             }

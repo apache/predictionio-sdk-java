@@ -3,21 +3,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.tappingstone</groupId>
-        <artifactId>predictionio</artifactId>
+        <groupId>io.prediction</groupId>
+        <artifactId>sdk</artifactId>
         <relativePath>../../pom.xml</relativePath>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>client</artifactId>
+    <artifactId>sample-client</artifactId>
     <packaging>jar</packaging>
-    <name>Examples: Client</name>
+    <name>PredictionIO Java SDK Examples: Client</name>
 
     <dependencies>
         <dependency>
-            <groupId>com.tappingstone</groupId>
-            <artifactId>predictionio-java</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <groupId>io.prediction</groupId>
+            <artifactId>client</artifactId>
+            <version>0.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -62,7 +62,19 @@
                     </archive>
                 </configuration>
             </plugin>
-        </plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>io.prediction.SampleClient</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                    </configuration>
+                </plugin>
+            </plugins>
     </build>
-
 </project>

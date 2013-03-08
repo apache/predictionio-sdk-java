@@ -8,21 +8,20 @@ import java.util.Date;
  * Item class for PredictionIO item objects
  *
  * @author TappingStone (help@tappingstone.com)
- * @version 0.2
+ * @version 0.3
  * @since 0.2
  */
 
 public class Item {
     private String iid;
-    private int[] itypes;
+    private String[] itypes;
     private Date startT;
     private Date endT;
     private Double latitude;
     private Double longitude;
     private DateTime created;
-    private DateTime modified;
 
-    public Item(String iid, int[] itypes) {
+    public Item(String iid, String[] itypes) {
         this.iid = iid;
         this.itypes = itypes;
     }
@@ -52,16 +51,11 @@ public class Item {
         return this;
     }
 
-    public Item modified(DateTime modified) {
-        this.modified = modified;
-        return this;
-    }
-
     public String getIid() {
         return this.iid;
     }
 
-    public int[] getItypes() {
+    public String[] getItypes() {
         return this.itypes;
     }
 
@@ -83,9 +77,5 @@ public class Item {
 
     public DateTime getCreated() {
         return this.created;
-    }
-
-    public DateTime getModified() {
-        return this.modified;
     }
 }

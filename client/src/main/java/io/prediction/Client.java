@@ -14,17 +14,18 @@ import java.io.IOException;
 import java.util.Date;
 
 /**
- * The PredictionIO Java class is a full feature abstraction on top of the RESTful PredictionIO web interface.
+ * The Client class is a full feature abstraction on top of the RESTful PredictionIO REST API interface.
  *
  * @author TappingStone (help@tappingstone.com)
- * @version 0.2
- * @since 0.2
+ * @version 0.3
+ * @since 0.1
  */
-public class PredictionIO {
-    private static Logger logger = Logger.getLogger(PredictionIO.class);
+public class Client {
+    private static Logger logger = Logger.getLogger(Client.class);
     // API base URL constant string
-    private final String defaultApiUrl = "http://localhost:8000";
-    private final String apiFormat = "json";
+    private static final String defaultApiUrl = "http://localhost:8000";
+    private static final String apiFormat = "json";
+    private static final int defaultThreadLimit = 100;
     // HTTP status code
     private final int HTTP_OK = 200;
     private final int HTTP_CREATED = 201;
@@ -36,43 +37,15 @@ public class PredictionIO {
     private AsyncHttpClientConfig config;
     private AsyncHttpClient client;
 
-    public PredictionIO(String appkey) {
-        this.setAppkey(appkey);
-        this.apiUrl = defaultApiUrl;
-
-        // Async HTTP client config
-        this.config = (new AsyncHttpClientConfig.Builder())
-                .setAllowPoolingConnection(true)
-                .setAllowSslConnectionPool(true)
-                .addRequestFilter(new ThrottleRequestFilter(100))
-                .setMaximumConnectionsPerHost(100)
-                .setRequestTimeoutInMs(5000)
-                .setIOThreadMultiplier(100)
-                .build();
-        this.client = new AsyncHttpClient(new NettyAsyncHttpProvider(config));
+    public Client(String appkey) {
+        this(appkey, Client.defaultApiUrl, Client.defaultThreadLimit);
     }
 
-    public PredictionIO(String appkey, String apiURL) {
-        this.setAppkey(appkey);
-        if (apiURL != null) {
-            this.apiUrl = apiURL;
-        } else {
-            this.apiUrl = defaultApiUrl;
-        }
-
-        // Async HTTP client config
-        this.config = (new AsyncHttpClientConfig.Builder())
-                .setAllowPoolingConnection(true)
-                .setAllowSslConnectionPool(true)
-                .addRequestFilter(new ThrottleRequestFilter(100))
-                .setMaximumConnectionsPerHost(100)
-                .setRequestTimeoutInMs(5000)
-                .setIOThreadMultiplier(100)
-                .build();
-        this.client = new AsyncHttpClient(new NettyAsyncHttpProvider(config));
+    public Client(String appkey, String apiURL) {
+        this(appkey, apiURL, Client.defaultThreadLimit);
     }
 
-    public PredictionIO(String appkey, String apiURL, int threadLimit) {
+    public Client(String appkey, String apiURL, int threadLimit) {
         if (apiURL != null) {
             this.apiUrl = apiURL;
         } else {
@@ -81,13 +54,13 @@ public class PredictionIO {
         this.setAppkey(appkey);
         // Async HTTP client config
         this.config = (new AsyncHttpClientConfig.Builder())
-                .setAllowPoolingConnection(true)
-                .setAllowSslConnectionPool(true)
-                .addRequestFilter(new ThrottleRequestFilter(threadLimit))
-                .setMaximumConnectionsPerHost(100)
-                .setRequestTimeoutInMs(5000)
-                .setIOThreadMultiplier(threadLimit)
-                .build();
+            .setAllowPoolingConnection(true)
+            .setAllowSslConnectionPool(true)
+            .addRequestFilter(new ThrottleRequestFilter(threadLimit))
+            .setMaximumConnectionsPerHost(threadLimit)
+            .setRequestTimeoutInMs(10000)
+            .setIOThreadMultiplier(threadLimit)
+            .build();
         this.client = new AsyncHttpClient(new NettyAsyncHttpProvider(config), config);
     }
 
@@ -153,7 +126,7 @@ public class PredictionIO {
     }
 
     public FutureAPIResponse getStatus() throws IOException {
-        return new FutureAPIResponse(this.client.prepareGet(this.apiUrl + "/status").execute(this.getHandler()));
+        return new FutureAPIResponse(this.client.prepareGet(this.apiUrl).execute(this.getHandler()));
     }
 
     public CreateUserRequestBuilder getCreateUserRequestBuilder(String uid) {
@@ -203,21 +176,6 @@ public class PredictionIO {
                 User user = new User(uid);
                 user.created(new DateTime(messageAsJson.get("ct").getAsLong()));
                 //Check values
-                try {
-                    if (messageAsJson.get("mt") != null) {
-                        user.modified(new DateTime(messageAsJson.get("mt").getAsLong()));
-                    }
-                } catch (ClassCastException cce) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("ClassCastException occurred trying to get mt");
-                        logger.error(cce.getMessage());
-                    }
-                } catch (Exception e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("Exception occurred trying to get mt");
-                        logger.error(e.getMessage());
-                    }
-                }
                 try {
                     if (messageAsJson.getAsJsonArray("latlng") != null) {
                         double latlng[] = this.jsonArrayAsDoubleArray(messageAsJson.getAsJsonArray("latlng"));
@@ -275,7 +233,7 @@ public class PredictionIO {
         }
     }
 
-    public CreateItemRequestBuilder getCreateItemRequestBuilder(String iid, int[] itypes) {
+    public CreateItemRequestBuilder getCreateItemRequestBuilder(String iid, String[] itypes) {
         return new CreateItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, iid, itypes);
     }
 
@@ -283,7 +241,7 @@ public class PredictionIO {
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
 
-    public boolean createItem(String iid, int[] itypes) throws IOException {
+    public boolean createItem(String iid, String[] itypes) throws IOException {
         return this.createItem(this.createItemAsFuture(this.getCreateItemRequestBuilder(iid, itypes)));
     }
 
@@ -319,24 +277,9 @@ public class PredictionIO {
                 JsonParser parser = new JsonParser();
                 JsonObject messageAsJson = (JsonObject) parser.parse(message);
                 String iid = messageAsJson.get("iid").getAsString();
-                int[] itypes = this.jsonArrayAsIntArray(messageAsJson.getAsJsonArray("itypes"));
+                String[] itypes = this.jsonArrayAsStringArray(messageAsJson.getAsJsonArray("itypes"));
                 Item item = new Item(iid, itypes);
                 item.created(new DateTime(messageAsJson.get("ct").getAsLong()));
-                try {
-                    if (messageAsJson.get("mt") != null) {
-                        item.modified(new DateTime(messageAsJson.get("mt").getAsLong()));
-                    }
-                } catch (ClassCastException cce) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("ClassCastException occurred trying to get mt");
-                        logger.error(cce.getMessage());
-                    }
-                } catch (Exception e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("Exception occurred trying to get mt");
-                        logger.error(e.getMessage());
-                    }
-                }
                 try {
                     if (messageAsJson.get("startT") != null) {
                         item.startT(new Date(messageAsJson.get("startT").getAsLong()));
@@ -424,16 +367,16 @@ public class PredictionIO {
         }
     }
 
-    public RecommendationsRequestBuilder getRecommendationsRequestBuilder(String uid, int n) {
-        return new RecommendationsRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, uid, n);
+    public RecommendationsRequestBuilder getRecommendationsRequestBuilder(String engine, String uid, int n) {
+        return new RecommendationsRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n);
     }
 
     public FutureAPIResponse getRecommendationsAsFuture(RecommendationsRequestBuilder builder) throws IOException {
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
 
-    public String[] getRecommendations(String uid, int n) throws IOException {
-        return this.getRecommendations(this.getRecommendationsAsFuture(this.getRecommendationsRequestBuilder(uid, n)));
+    public String[] getRecommendations(String engine, String uid, int n) throws IOException {
+        return this.getRecommendations(this.getRecommendationsAsFuture(this.getRecommendationsRequestBuilder(engine, uid, n)));
     }
 
     public String[] getRecommendations(RecommendationsRequestBuilder builder) throws IOException {

@@ -3,12 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.tappingstone</groupId>
-    <artifactId>predictionio</artifactId>
-    <version>0.2-SNAPSHOT</version>
-    <url>http://tappingstone.com</url>
+    <groupId>io.prediction</groupId>
+    <artifactId>sdk</artifactId>
+    <version>0.3-SNAPSHOT</version>
+    <url>http://prediction.io</url>
     <packaging>pom</packaging>
-    <name>PredictionIO SDK</name>
+    <name>PredictionIO Java SDK</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,7 +17,7 @@
     </properties>
 
     <modules>
-        <module>java-sdk</module>
+        <module>client</module>
     </modules>
 
     <build>

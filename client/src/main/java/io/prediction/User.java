@@ -6,7 +6,7 @@ import org.joda.time.DateTime;
  * User class for PredictionIO User objects
  *
  * @author TappingStone (help@tappingstone.com)
- * @version 0.2
+ * @version 0.3
  * @since 0.2
  */
 
@@ -15,7 +15,6 @@ public class User {
     private Double latitude;
     private Double longitude;
     private DateTime created;
-    private DateTime modified;
 
     public User(String uid) {
         this.uid = uid;
@@ -36,11 +35,6 @@ public class User {
         return this;
     }
 
-    public User modified(DateTime modified) {
-        this.modified = modified;
-        return this;
-    }
-
     public String getUid() {
         return this.uid;
     }
@@ -55,9 +49,5 @@ public class User {
 
     public DateTime getCreated() {
         return this.created;
-    }
-
-    public DateTime getModified() {
-        return this.modified;
     }
 }
