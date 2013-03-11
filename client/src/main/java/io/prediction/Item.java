@@ -7,7 +7,7 @@ import java.util.Date;
 /**
  * Item class for PredictionIO item objects
  *
- * @author TappingStone (help@tappingstone.com)
+ * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
  * @version 0.3
  * @since 0.2
  */

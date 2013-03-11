@@ -5,7 +5,7 @@ import org.joda.time.DateTime;
 /**
  * User class for PredictionIO User objects
  *
- * @author TappingStone (help@tappingstone.com)
+ * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
  * @version 0.3
  * @since 0.2
  */

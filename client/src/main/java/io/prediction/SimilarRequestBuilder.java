@@ -6,7 +6,7 @@ import com.ning.http.client.RequestBuilder;
 /**
  * Class to build Similar Requests
  *
- * @author TappingStone (help@tappingstone.com)
+ * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
  * @version 0.2
  * @since 0.2
  */

@@ -3,7 +3,7 @@ package io.prediction;
 /**
  * API Response class for wrapping responses
  *
- * @author TappingStone (help@tappingstone.com)
+ * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
  * @version 0.2
  * @since 0.2
  */
