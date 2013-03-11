@@ -17,8 +17,10 @@ import java.util.StringTokenizer;
  */
 public class SampleImport {
     public static void main(String[] args) {
-        PredictionIO predictionIO = new PredictionIO("6ztw3ty3P1Pgqj4cOPXdTUlSR6ZAYQNhNdYAfWb77LfnfrbBZDex58hcb3e4ehIt");
+        Client client = new Client("6ztw3ty3P1Pgqj4cOPXdTUlSR6ZAYQNhNdYAfWb77LfnfrbBZDex58hcb3e4ehIt");
         try {
+            System.out.println(client.getStatus().getMessage());
+
             FileInputStream fstream = new FileInputStream(args[0]);
             DataInputStream dstream = new DataInputStream(fstream);
             BufferedReader reader = new BufferedReader(new InputStreamReader(dstream));
@@ -37,10 +39,10 @@ public class SampleImport {
                 iid = st.nextToken();
                 rate = Math.round((Float.parseFloat(st.nextToken()) - 1) / 4 * 10);
                 t = new DateTime();
-                FutureAPIResponse r = predictionIO.userRateItemAsFuture(predictionIO.getUserRateItemRequestBuilder(uid, iid, rate).t(t));
+                FutureAPIResponse r = client.userRateItemAsFuture(client.getUserRateItemRequestBuilder(uid, iid, rate).t(t));
                 rs.add(r);
                 i++;
-                Thread.sleep(250);
+                Thread.sleep(150);
             }
             while (rs.size() < i) {
                 Thread.sleep(1000);

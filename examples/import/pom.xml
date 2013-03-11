@@ -15,9 +15,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.tappingstone</groupId>
-            <artifactId>predictionio-java</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <groupId>io.prediction</groupId>
+            <artifactId>client</artifactId>
+            <version>0.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
