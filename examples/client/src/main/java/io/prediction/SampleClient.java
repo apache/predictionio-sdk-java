@@ -13,8 +13,15 @@ import java.io.IOException;
 public class SampleClient {
     public static void main(String[] args) {
         /** Customize these */
-        String appkey = "4fMGq5vqjj12rJkBTLkX6mnzKZbs7okR3xlIkbuG4MAtvjB0sIiqsYe5FtTpkKjt";
-        String engine = "movies";
+        String appkey = null;
+        String engine = null;
+        try {
+            appkey = args[0];
+            engine = args[1];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("You must provide appkey (1st arg) and engine name (2nd arg)");
+            System.exit(1);
+        }
 
         Client client = new Client(appkey);
         try {
