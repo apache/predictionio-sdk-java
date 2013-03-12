@@ -31,23 +31,35 @@ Examples
 
 ### Building
 
-Edit the source and replace App keys and API URLs with your test server.
+If your PredictionIO server is not at localhost, edit the source and replace API URLs with your PredictionIO server host.
 
 To build these examples you will need Maven 3+.
 Run the following in each example's directory, e.g.
 
+    cd ~/PredictionIO-Java-SDK/examples/import
+    mvn clean compile assembly:single
 	cd ~/PredictionIO-Java-SDK/examples/client
     mvn clean compile assembly:single
 
-This will create one JAR file with all dependencies built in.
+These will create JAR files with all dependencies built in.
 
-### Usage
+### Try It Now
 
-For SampleClient, usage is as follows.
+First, you need to create an Application on PredictionIO and obtain an appkey.
 
-	cd ~/PredictionIO-Java-SDK/examples/client
-    java -jar target/sample-client-0.3-SNAPSHOT-jar-with-dependencies.jar
+To import the provided small sample data:
 
+    cd ~/PredictionIO-Java-SDK/examples/import
+    java -jar target/sample-import-<latest version>.jar <your appkey here> sampledata/sample1.txt 
+
+You will then have to create an engine and make sure that it's up and running. It may take an hour for the prediction results to be generated.  
+
+Then, you can run the sample client of various tasks:
+
+	cd ~/PredictionIO-Java-SDK/examples/simpletasks1
+    java -jar target/sample-client-<latest version>-jar-with-dependencies.jar <your appkey here> <your engine name here>
+
+Enjoy!
 
 Support
 =========

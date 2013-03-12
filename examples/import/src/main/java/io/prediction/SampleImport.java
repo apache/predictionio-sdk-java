@@ -17,6 +17,8 @@ import java.util.StringTokenizer;
  */
 public class SampleImport {
     public static void main(String[] args) {
+    	/* set appurl to your API server */
+    	String appurl = "http://localhost:8000";
         /* Handle command line arguments */
         String appkey = null;
         String inputFile = null;

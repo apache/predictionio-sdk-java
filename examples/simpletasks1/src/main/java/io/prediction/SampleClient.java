@@ -12,7 +12,9 @@ import java.io.IOException;
  */
 public class SampleClient {
     public static void main(String[] args) {
-        /** Customize these */
+    	/* set appurl to your API server */
+        String appurl = "http://localhost:8000";
+        /* Handle command line arguments */
         String appkey = null;
         String engine = null;
         try {
@@ -23,7 +25,7 @@ public class SampleClient {
             System.exit(1);
         }
 
-        Client client = new Client(appkey);
+        Client client = new Client(appkey, appurl);
         try {
             // Get API system status
             System.out.println(client.getStatus().getMessage());
