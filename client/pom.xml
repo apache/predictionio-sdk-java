@@ -6,7 +6,7 @@
         <groupId>io.prediction</groupId>
         <artifactId>sdk</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>0.3</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>client</artifactId>
