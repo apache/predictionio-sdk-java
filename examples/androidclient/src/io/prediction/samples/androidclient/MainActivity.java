@@ -83,6 +83,13 @@ public class MainActivity extends Activity {
 		engine.setText("test");
 		uid.setText("1");
 		n.setText("10");
+		
+		// Android 2.2 emulator workaround
+		// You probably do not need this on real hardware
+		// https://code.google.com/p/android/issues/detail?id=9431
+		System.setProperty("java.net.preferIPv4Stack", "true");
+		System.setProperty("java.net.preferIPv6Addresses", "false");
+		
 		client = new Client("", apiUrl.getText().toString(), 10);
 	}
 
