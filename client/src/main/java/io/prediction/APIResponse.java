@@ -12,11 +12,6 @@ public class APIResponse {
     private int status;
     private String message;
 
-    public APIResponse() {
-        this.status = 0;
-        this.message = "";
-    }
-
     public APIResponse(int status, String message) {
         this.status = status;
         this.message = message;

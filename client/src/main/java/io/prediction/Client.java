@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The Client class is a full feature abstraction on top of the RESTful PredictionIO REST API interface.
@@ -34,6 +35,9 @@ public class Client {
     // HTTP status code
     private final int HTTP_OK = 200;
     private final int HTTP_CREATED = 201;
+    private static final int HTTP_BAD_REQUEST = 400;
+    private static final int HTTP_FORBIDDEN = 403;
+    private static final int HTTP_NOT_FOUND = 404;
     //API Url
     private String apiUrl;
     // Appkey
@@ -41,6 +45,8 @@ public class Client {
     // Async HTTP client
     private AsyncHttpClientConfig config;
     private AsyncHttpClient client;
+
+    private JsonParser parser = new JsonParser();
 
     /**
      * Instantiate a PredictionIO RESTful API client using default values for API URL and thread limit.
@@ -157,6 +163,18 @@ public class Client {
     public void setAppkey(String appkey) {
         // Set current API's appkey
         this.appkey = appkey;
+    }
+
+    /**
+     * Set the API URL of this client.
+     * <p>
+     * All subsequent requests after this method will use the new API URL.
+     *
+     * @param apiUrl the new API URL to be used
+     */
+    public void setApiUrl(String apiUrl) {
+        // Set current API's appkey
+        this.apiUrl = apiUrl;
     }
 
     /**
@@ -543,7 +561,7 @@ public class Client {
      * @param uid ID of the User whose recommendations will be gotten
      * @param n number of top recommendations to get
      */
-    public String[] getRecommendations(String engine, String uid, int n) throws IOException {
+    public String[] getRecommendations(String engine, String uid, int n) throws ExecutionException, InterruptedException, IOException {
         return this.getRecommendations(this.getRecommendationsAsFuture(this.getRecommendationsRequestBuilder(engine, uid, n)));
     }
 
@@ -552,7 +570,7 @@ public class Client {
      *
      * @param builder an instance of {@link RecommendationsRequestBuilder} that will be turned into a request
      */
-    public String[] getRecommendations(RecommendationsRequestBuilder builder) throws IOException {
+    public String[] getRecommendations(RecommendationsRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         return this.getRecommendations(this.getRecommendationsAsFuture(builder));
     }
 
@@ -561,35 +579,17 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getRecommendationsAsFuture}
      */
-    public String[] getRecommendations(FutureAPIResponse response) {
-        int status = response.getStatus();
+    public String[] getRecommendations(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        // Do not use getStatus/getMessage directly as they do not pass exceptions
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
 
         if (status == this.HTTP_OK) {
-            String message = response.getMessage();
-            try {
-                //New implementation using gson
-                JsonParser parser = new JsonParser();
-                JsonObject messageAsJson = (JsonObject) parser.parse(message);
-                JsonArray iidsAsJson = messageAsJson.getAsJsonArray("iids");
-                return this.jsonArrayAsStringArray(iidsAsJson);
-//                JSONObject messageAsJson = new JSONObject(message);
-//                JSONArray iidsAsJson = messageAsJson.getJSONArray("iids");
-//                return this.jsonArrayAsStringArray(iidsAsJson);
-            } catch (JsonParseException e) {
-                if (logger.isDebugEnabled()) {
-                    logger.error("JsonParseException occurred in getRecommendations");
-                    logger.error(e.getMessage());
-                }
-                return new String[0];
-            } catch (Exception e) {
-                if (logger.isDebugEnabled()) {
-                    logger.error("General Exception occurred trying to get getRecommendations");
-                    logger.error(e.getMessage());
-                }
-                return new String[0];
-            }
+            JsonObject messageAsJson = (JsonObject) parser.parse(message);
+            JsonArray iidsAsJson = messageAsJson.getAsJsonArray("iids");
+            return this.jsonArrayAsStringArray(iidsAsJson);
         } else {
-            return new String[0];
+            throw new IOException(message);
         }
     }
 
