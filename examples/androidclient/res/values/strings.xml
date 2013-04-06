@@ -2,7 +2,13 @@
 <resources>
 
     <string name="app_name">AndroidClient</string>
-    <string name="action_settings">Settings</string>
-    <string name="server_address">Server Address</string>
-
+    <string name="api_url">API URL</string>
+    <string name="button_get_status">Get Status</string>
+    <string name="console_output">Console Output</string>
+    <string name="app_key">App Key</string>
+    <string name="engine">Engine</string>
+    <string name="button_get_recs">Get Recs</string>
+    <string name="uid">UID</string>
+    <string name="n">#</string>
+    
 </resources>
