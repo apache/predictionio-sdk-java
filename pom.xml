@@ -29,6 +29,11 @@
             <name>The PredictionIO Team</name>
             <email>support@prediction.io</email>
         </developer>
+        <developer>
+            <id>cqin</id>
+            <name>Cong Qin</name>
+            <email>Cong.Charlie.Qin@gmail.com</email>
+        </developer>
     </developers>
 
     <scm>
