@@ -2,8 +2,6 @@ package io.prediction.samples.androidclient;
 
 import io.prediction.Client;
 
-import java.io.IOException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -30,8 +28,8 @@ public class MainActivity extends Activity {
 			client.setApiUrl(apiUrl.getText().toString());
 			String status = "";
 			try {
-				status = client.getStatus().getMessage();
-			} catch (IOException e) {
+				status = client.getStatus();
+			} catch (Exception e) {
 				status = ExceptionUtils.getStackTrace(e);
 			}
 			return status;
@@ -55,7 +53,7 @@ public class MainActivity extends Activity {
 			client.setApiUrl(apiUrl.getText().toString());
 			String result = "";
 			try {
-				String[] iids = client.getRecommendations(engine.getText()
+				String[] iids = client.getItemRecTopN(engine.getText()
 						.toString(), uid.getText().toString(), Integer
 						.parseInt(n.getText().toString()));
 				result = StringUtils.join(iids, ",");
@@ -83,16 +81,26 @@ public class MainActivity extends Activity {
 		engine.setText("test");
 		uid.setText("1");
 		n.setText("10");
-		
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		EditText apiUrl = (EditText) findViewById(R.id.api_url);
 		// Android 2.2 emulator workaround
 		// You probably do not need this on real hardware
 		// https://code.google.com/p/android/issues/detail?id=9431
 		System.setProperty("java.net.preferIPv4Stack", "true");
 		System.setProperty("java.net.preferIPv6Addresses", "false");
-		
 		client = new Client("", apiUrl.getText().toString(), 10);
 	}
-
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		client.close();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
