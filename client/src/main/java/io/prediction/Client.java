@@ -185,6 +185,10 @@ public class Client {
 
     /**
      * Get status of the API.
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public String getStatus() throws ExecutionException, InterruptedException, IOException {
         return (new FutureAPIResponse(this.client.prepareGet(this.apiUrl).execute(this.getHandler()))).get().getMessage();
@@ -212,6 +216,10 @@ public class Client {
      * Sends a synchronous create user request to the API.
      *
      * @param uid ID of the User to be created
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void createUser(String uid) throws ExecutionException, InterruptedException, IOException {
         this.createUser(this.createUserAsFuture(this.getCreateUserRequestBuilder(uid)));
@@ -221,6 +229,10 @@ public class Client {
      * Sends a synchronous create user request to the API.
      *
      * @param builder an instance of {@link CreateUserRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void createUser(CreateUserRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.createUser(this.createUserAsFuture(builder));
@@ -230,6 +242,10 @@ public class Client {
      * Synchronize a previously sent asynchronous create user request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#createUserAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void createUser(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         int status = response.get().getStatus();
@@ -254,6 +270,10 @@ public class Client {
      * Sends a synchronous get user request to the API.
      *
      * @param uid ID of the User to get
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public User getUser(String uid) throws ExecutionException, InterruptedException, IOException {
         return this.getUser(this.getUserAsFuture(uid));
@@ -263,6 +283,10 @@ public class Client {
      * Synchronize a previously sent asynchronous get user request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getUserAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public User getUser(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         int status = response.get().getStatus();
@@ -300,6 +324,10 @@ public class Client {
      * Sends a synchronous delete user request to the API.
      *
      * @param uid ID of the User to be deleted
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void deleteUser(String uid) throws ExecutionException, InterruptedException, IOException {
         this.deleteUser(this.deleteUserAsFuture(uid));
@@ -309,6 +337,10 @@ public class Client {
      * Synchronize a previously sent asynchronous delete user request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#deleteUserAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void deleteUser(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         int status = response.get().getStatus();
@@ -343,6 +375,10 @@ public class Client {
      *
      * @param iid ID of the Item to be created
      * @param itypes array of types of the Item
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void createItem(String iid, String[] itypes) throws ExecutionException, InterruptedException, IOException {
         this.createItem(this.createItemAsFuture(this.getCreateItemRequestBuilder(iid, itypes)));
@@ -352,6 +388,10 @@ public class Client {
      * Sends a synchronous create item request to the API.
      *
      * @param builder an instance of {@link CreateItemRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void createItem(CreateItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.createItem(this.createItemAsFuture(builder));
@@ -361,6 +401,10 @@ public class Client {
      * Synchronize a previously sent asynchronous create item request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#createItemAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void createItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         int status = response.get().getStatus();
@@ -385,6 +429,10 @@ public class Client {
      * Sends a synchronous get item request to the API.
      *
      * @param iid ID of the Item to get
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public Item getItem(String iid) throws ExecutionException, InterruptedException, IOException {
         return this.getItem(this.getItemAsFuture(iid));
@@ -394,6 +442,10 @@ public class Client {
      * Synchronize a previously sent asynchronous get item request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getItemAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public Item getItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         int status = response.get().getStatus();
@@ -438,6 +490,10 @@ public class Client {
      * Sends a synchronous delete item request to the API.
      *
      * @param iid ID of the Item to be deleted
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void deleteItem(String iid) throws ExecutionException, InterruptedException, IOException {
         this.deleteItem(this.deleteItemAsFuture(iid));
@@ -447,6 +503,10 @@ public class Client {
      * Synchronize a previously sent asynchronous delete item request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#deleteItemAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void deleteItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         int status = response.get().getStatus();
@@ -483,6 +543,10 @@ public class Client {
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
      * @param n number of top recommendations to get
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public String[] getItemRecTopN(String engine, String uid, int n) throws ExecutionException, InterruptedException, IOException {
         return this.getItemRecTopN(this.getItemRecTopNAsFuture(this.getItemRecGetTopNRequestBuilder(engine, uid, n)));
@@ -492,6 +556,10 @@ public class Client {
      * Sends a synchronous get recommendations request to the API.
      *
      * @param builder an instance of {@link ItemRecGetTopNRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public String[] getItemRecTopN(ItemRecGetTopNRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         return this.getItemRecTopN(this.getItemRecTopNAsFuture(builder));
@@ -501,6 +569,10 @@ public class Client {
      * Synchronize a previously sent asynchronous get recommendations request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getItemRecTopNAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public String[] getItemRecTopN(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         // Do not use getStatus/getMessage directly as they do not pass exceptions
@@ -553,6 +625,10 @@ public class Client {
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
      * @param rate the rating of this action
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userRateItem(String uid, String iid, int rate) throws ExecutionException, InterruptedException, IOException {
         this.userRateItem(this.userRateItemAsFuture(this.getUserRateItemRequestBuilder(uid, iid, rate)));
@@ -562,6 +638,10 @@ public class Client {
      * Sends a synchronous user-rate-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userRateItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.userRateItem(this.userRateItemAsFuture(builder));
@@ -571,6 +651,10 @@ public class Client {
      * Synchronize a previously sent asynchronous user-rate-item action request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userRateItemAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userRateItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         this.userActionItem(response);
@@ -600,6 +684,10 @@ public class Client {
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userLikeItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
         this.userLikeItem(this.userLikeItemAsFuture(this.getUserLikeItemRequestBuilder(uid, iid)));
@@ -609,6 +697,10 @@ public class Client {
      * Sends a synchronous user-like-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userLikeItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.userLikeItem(this.userLikeItemAsFuture(builder));
@@ -618,6 +710,10 @@ public class Client {
      * Synchronize a previously sent asynchronous user-like-item action request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userLikeItemAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userLikeItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         this.userActionItem(response);
@@ -647,6 +743,10 @@ public class Client {
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userDislikeItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
         this.userDislikeItem(this.userDislikeItemAsFuture(this.getUserDislikeItemRequestBuilder(uid, iid)));
@@ -656,6 +756,10 @@ public class Client {
      * Sends a synchronous user-dislike-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userDislikeItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.userDislikeItem(this.userDislikeItemAsFuture(builder));
@@ -665,6 +769,10 @@ public class Client {
      * Synchronize a previously sent asynchronous user-dislike-item action request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userDislikeItemAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userDislikeItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         this.userActionItem(response);
@@ -694,6 +802,10 @@ public class Client {
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userViewItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
         this.userViewItem(this.userViewItemAsFuture(this.getUserViewItemRequestBuilder(uid, iid)));
@@ -703,6 +815,10 @@ public class Client {
      * Sends a synchronous user-view-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userViewItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.userViewItem(this.userViewItemAsFuture(builder));
@@ -712,6 +828,10 @@ public class Client {
      * Synchronize a previously sent asynchronous user-view-item action request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userViewItemAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userViewItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         this.userActionItem(response);
@@ -741,6 +861,10 @@ public class Client {
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userConversionItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
         this.userConversionItem(this.userConversionItemAsFuture(this.getUserConversionItemRequestBuilder(uid, iid)));
@@ -750,6 +874,10 @@ public class Client {
      * Sends a synchronous user-conversion-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userConversionItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.userConversionItem(this.userConversionItemAsFuture(builder));
@@ -759,9 +887,12 @@ public class Client {
      * Synchronize a previously sent asynchronous user-conversion-item action request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userConversionItemAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
      */
     public void userConversionItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         this.userActionItem(response);
     }
 }
-
