@@ -29,12 +29,14 @@
             <name>The PredictionIO Team</name>
             <email>support@prediction.io</email>
         </developer>
-        <developer>
-            <id>cqin</id>
+    </developers>
+
+    <contributors>
+        <contributor>
             <name>Cong Qin</name>
             <email>Cong.Charlie.Qin@gmail.com</email>
-        </developer>
-    </developers>
+        </contributor>
+    </contributors>
 
     <scm>
         <connection>scm:git:git@github.com:PredictionIO/PredictionIO-Java-SDK.git</connection>

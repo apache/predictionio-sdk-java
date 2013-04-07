@@ -1,4 +1,7 @@
-package io.prediction;
+package io.prediction.samples;
+
+import io.prediction.Client;
+import io.prediction.FutureAPIResponse;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -40,7 +43,7 @@ public class SampleImport {
         /* Read input MovieLens data and send requests to API */
         try {
             /* Get API status */
-            System.out.println(client.getStatus().getMessage());
+            System.out.println(client.getStatus());
 
             /* Open data file for reading */
             FileInputStream fstream = new FileInputStream(inputFile);
@@ -101,5 +104,6 @@ public class SampleImport {
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }
+        client.close();
     }
 }

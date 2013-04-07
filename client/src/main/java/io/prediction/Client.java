@@ -7,7 +7,6 @@ import com.google.gson.JsonParser;
 import com.ning.http.client.*;
 import com.ning.http.client.extra.ThrottleRequestFilter;
 import com.ning.http.client.providers.netty.NettyAsyncHttpProvider;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -23,18 +22,17 @@ import java.util.concurrent.ExecutionException;
  * Multiple simultaneous asynchronous requests is made possible by the high performance backend provided by the <a href="https://github.com/AsyncHttpClient/async-http-client">Async Http Client</a>.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.3
+ * @version 0.3.1
  * @since 0.1
  */
 public class Client {
-    private static Logger logger = Logger.getLogger(Client.class);
     // API base URL constant string
     private static final String defaultApiUrl = "http://localhost:8000";
     private static final String apiFormat = "json";
     private static final int defaultThreadLimit = 100;
     // HTTP status code
-    private final int HTTP_OK = 200;
-    private final int HTTP_CREATED = 201;
+    private static final int HTTP_OK = 200;
+    private static final int HTTP_CREATED = 201;
     private static final int HTTP_BAD_REQUEST = 400;
     private static final int HTTP_FORBIDDEN = 403;
     private static final int HTTP_NOT_FOUND = 404;
@@ -95,6 +93,14 @@ public class Client {
             .setIOThreadMultiplier(threadLimit)
             .build();
         this.client = new AsyncHttpClient(new NettyAsyncHttpProvider(config), config);
+    }
+
+    /**
+     * Close all connections associated with this client.
+     * It is a good practice to always close the client after use.
+     */
+    public void close() {
+        this.client.close();
     }
 
     private AsyncHandler<APIResponse> getHandler() {
@@ -180,8 +186,8 @@ public class Client {
     /**
      * Get status of the API.
      */
-    public FutureAPIResponse getStatus() throws IOException {
-        return new FutureAPIResponse(this.client.prepareGet(this.apiUrl).execute(this.getHandler()));
+    public String getStatus() throws ExecutionException, InterruptedException, IOException {
+        return (new FutureAPIResponse(this.client.prepareGet(this.apiUrl).execute(this.getHandler()))).get().getMessage();
     }
 
     /**
@@ -207,8 +213,8 @@ public class Client {
      *
      * @param uid ID of the User to be created
      */
-    public boolean createUser(String uid) throws IOException {
-        return this.createUser(this.createUserAsFuture(this.getCreateUserRequestBuilder(uid)));
+    public void createUser(String uid) throws ExecutionException, InterruptedException, IOException {
+        this.createUser(this.createUserAsFuture(this.getCreateUserRequestBuilder(uid)));
     }
 
     /**
@@ -216,8 +222,8 @@ public class Client {
      *
      * @param builder an instance of {@link CreateUserRequestBuilder} that will be turned into a request
      */
-    public boolean createUser(CreateUserRequestBuilder builder) throws IOException {
-        return this.createUser(this.createUserAsFuture(builder));
+    public void createUser(CreateUserRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        this.createUser(this.createUserAsFuture(builder));
     }
 
     /**
@@ -225,13 +231,12 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#createUserAsFuture}
      */
-    public boolean createUser(FutureAPIResponse response) {
-        int status = response.getStatus();
+    public void createUser(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
 
-        if (status == this.HTTP_CREATED) {
-            return true;
-        } else {
-            return false;
+        if (status != Client.HTTP_CREATED) {
+            throw new IOException(message);
         }
     }
 
@@ -250,7 +255,7 @@ public class Client {
      *
      * @param uid ID of the User to get
      */
-    public User getUser(String uid) throws IOException {
+    public User getUser(String uid) throws ExecutionException, InterruptedException, IOException {
         return this.getUser(this.getUserAsFuture(uid));
     }
 
@@ -259,51 +264,23 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getUserAsFuture}
      */
-    public User getUser(FutureAPIResponse response) {
-        int status = response.getStatus();
+    public User getUser(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
 
-        if (status == this.HTTP_OK) {
-            String message = response.getMessage();
-            try {
-                JsonParser parser = new JsonParser();
-                JsonObject messageAsJson = (JsonObject) parser.parse(message);
-                String uid = messageAsJson.get("uid").getAsString();
-                User user = new User(uid);
-                user.created(new DateTime(messageAsJson.get("ct").getAsLong()));
-                //Check values
-                try {
-                    if (messageAsJson.getAsJsonArray("latlng") != null) {
-                        double latlng[] = this.jsonArrayAsDoubleArray(messageAsJson.getAsJsonArray("latlng"));
-                        user.latitude(new Double(latlng[0]));
-                        user.longitude(new Double(latlng[1]));
-                    }
-                } catch (ClassCastException cce) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("ClassCastException occurred trying to get latlng");
-                        logger.error(cce.getMessage());
-                    }
-                } catch (Exception e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("Exception occurred trying to get latlng");
-                        logger.error(e.getMessage());
-                    }
-                }
-                return user;
-            } catch (JsonParseException e) {
-                if (logger.isDebugEnabled()) {
-                    logger.error("JsonParseException occurred");
-                    logger.error(e.getMessage());
-                }
-                return null;
-            } catch (Exception e) {
-                if (logger.isDebugEnabled()) {
-                    logger.error("General Exception occurred in getUser");
-                    logger.error(e.getMessage());
-                }
-                return null;
+        if (status == Client.HTTP_OK) {
+            JsonObject messageAsJson = (JsonObject) parser.parse(message);
+            String uid = messageAsJson.get("uid").getAsString();
+            User user = new User(uid);
+            user.created(new DateTime(messageAsJson.get("ct").getAsLong()));
+            if (messageAsJson.getAsJsonArray("latlng") != null) {
+                double latlng[] = this.jsonArrayAsDoubleArray(messageAsJson.getAsJsonArray("latlng"));
+                user.latitude(new Double(latlng[0]));
+                user.longitude(new Double(latlng[1]));
             }
+            return user;
         } else {
-            return null;
+            throw new IOException(message);
         }
     }
 
@@ -324,8 +301,8 @@ public class Client {
      *
      * @param uid ID of the User to be deleted
      */
-    public boolean deleteUser(String uid) throws IOException {
-        return this.deleteUser(this.deleteUserAsFuture(uid));
+    public void deleteUser(String uid) throws ExecutionException, InterruptedException, IOException {
+        this.deleteUser(this.deleteUserAsFuture(uid));
     }
 
     /**
@@ -333,13 +310,12 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#deleteUserAsFuture}
      */
-    public boolean deleteUser(FutureAPIResponse response) {
-        int status = response.getStatus();
+    public void deleteUser(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
 
-        if (status == this.HTTP_OK) {
-            return true;
-        } else {
-            return false;
+        if (status != Client.HTTP_OK) {
+            throw new IOException(message);
         }
     }
 
@@ -368,8 +344,8 @@ public class Client {
      * @param iid ID of the Item to be created
      * @param itypes array of types of the Item
      */
-    public boolean createItem(String iid, String[] itypes) throws IOException {
-        return this.createItem(this.createItemAsFuture(this.getCreateItemRequestBuilder(iid, itypes)));
+    public void createItem(String iid, String[] itypes) throws ExecutionException, InterruptedException, IOException {
+        this.createItem(this.createItemAsFuture(this.getCreateItemRequestBuilder(iid, itypes)));
     }
 
     /**
@@ -377,8 +353,8 @@ public class Client {
      *
      * @param builder an instance of {@link CreateItemRequestBuilder} that will be turned into a request
      */
-    public boolean createItem(CreateItemRequestBuilder builder) throws IOException {
-        return this.createItem(this.createItemAsFuture(builder));
+    public void createItem(CreateItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        this.createItem(this.createItemAsFuture(builder));
     }
 
     /**
@@ -386,13 +362,12 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#createItemAsFuture}
      */
-    public boolean createItem(FutureAPIResponse response) {
-        int status = response.getStatus();
+    public void createItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
 
-        if (status == this.HTTP_CREATED) {
-            return true;
-        } else {
-            return false;
+        if (status != Client.HTTP_CREATED) {
+            throw new IOException(message);
         }
     }
 
@@ -411,7 +386,7 @@ public class Client {
      *
      * @param iid ID of the Item to get
      */
-    public Item getItem(String iid) throws IOException {
+    public Item getItem(String iid) throws ExecutionException, InterruptedException, IOException {
         return this.getItem(this.getItemAsFuture(iid));
     }
 
@@ -420,81 +395,30 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getItemAsFuture}
      */
-    public Item getItem(FutureAPIResponse response) {
-        int status = response.getStatus();
+    public Item getItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
 
-        if (status == this.HTTP_OK) {
-            String message = response.getMessage();
-            try {
-                JsonParser parser = new JsonParser();
-                JsonObject messageAsJson = (JsonObject) parser.parse(message);
-                String iid = messageAsJson.get("iid").getAsString();
-                String[] itypes = this.jsonArrayAsStringArray(messageAsJson.getAsJsonArray("itypes"));
-                Item item = new Item(iid, itypes);
-                item.created(new DateTime(messageAsJson.get("ct").getAsLong()));
-                try {
-                    if (messageAsJson.get("startT") != null) {
-                        item.startT(new Date(messageAsJson.get("startT").getAsLong()));
-                    }
-                } catch (ClassCastException cce) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("ClassCastException occurred trying to get startT");
-                        logger.error(cce.getMessage());
-                    }
-                } catch (Exception e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("Exception occurred trying to get startT");
-                        logger.error(e.getMessage());
-                    }
-                }
-                try {
-                    if (messageAsJson.get("endT") != null) {
-                        item.endT(new Date(messageAsJson.get("endT").getAsLong()));
-                    }
-                } catch (ClassCastException cce) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("ClassCastException occurred trying to get endT");
-                        logger.error(cce.getMessage());
-                    }
-                } catch (Exception e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("Exception occurred trying to get endT");
-                        logger.error(e.getMessage());
-                    }
-                }
-                try {
-                    if (messageAsJson.getAsJsonArray("latlng") != null) {
-                        double latlng[] = this.jsonArrayAsDoubleArray(messageAsJson.getAsJsonArray("latlng"));
-                        item.latitude(new Double(latlng[0]));
-                        item.longitude(new Double(latlng[1]));
-                    }
-                } catch (ClassCastException cce) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("ClassCastException occurred trying to get latlng");
-                        logger.error(cce.getMessage());
-                    }
-                } catch (Exception e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.error("Exception occurred trying to get latlng");
-                        logger.error(e.getMessage());
-                    }
-                }
-                return item;
-            } catch (JsonParseException e) {
-                if (logger.isDebugEnabled()) {
-                    logger.error("JsonParseException occurred");
-                    logger.error(e.getMessage());
-                }
-                return null;
-            } catch (Exception e) {
-                if (logger.isDebugEnabled()) {
-                    logger.error("General exception occurred in getItem");
-                    logger.error(e.getMessage());
-                }
-                return null;
+        if (status == Client.HTTP_OK) {
+            JsonObject messageAsJson = (JsonObject) parser.parse(message);
+            String iid = messageAsJson.get("iid").getAsString();
+            String[] itypes = this.jsonArrayAsStringArray(messageAsJson.getAsJsonArray("itypes"));
+            Item item = new Item(iid, itypes);
+            item.created(new DateTime(messageAsJson.get("ct").getAsLong()));
+            if (messageAsJson.get("startT") != null) {
+                item.startT(new Date(messageAsJson.get("startT").getAsLong()));
             }
+            if (messageAsJson.get("endT") != null) {
+                item.endT(new Date(messageAsJson.get("endT").getAsLong()));
+            }
+            if (messageAsJson.getAsJsonArray("latlng") != null) {
+                double latlng[] = this.jsonArrayAsDoubleArray(messageAsJson.getAsJsonArray("latlng"));
+                item.latitude(new Double(latlng[0]));
+                item.longitude(new Double(latlng[1]));
+            }
+            return item;
         } else {
-            return null;
+            throw new IOException(message);
         }
     }
 
@@ -515,8 +439,8 @@ public class Client {
      *
      * @param iid ID of the Item to be deleted
      */
-    public boolean deleteItem(String iid) throws IOException {
-        return this.deleteItem(this.deleteItemAsFuture(iid));
+    public void deleteItem(String iid) throws ExecutionException, InterruptedException, IOException {
+        this.deleteItem(this.deleteItemAsFuture(iid));
     }
 
     /**
@@ -524,33 +448,32 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#deleteItemAsFuture}
      */
-    public boolean deleteItem(FutureAPIResponse response) {
-        int status = response.getStatus();
+    public void deleteItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
 
-        if (status == this.HTTP_OK) {
-            return true;
-        } else {
-            return false;
+        if (status != Client.HTTP_OK) {
+            throw new IOException(message);
         }
     }
 
     /**
-     * Get a get recommendations request builder that can be used to add additional request parameters.
+     * Get a get top-n recommendations request builder that can be used to add additional request parameters.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
      * @param n number of top recommendations to get
      */
-    public RecommendationsRequestBuilder getRecommendationsRequestBuilder(String engine, String uid, int n) {
-        return new RecommendationsRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n);
+    public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, String uid, int n) {
+        return new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n);
     }
 
     /**
      * Sends an asynchronous get recommendations request to the API.
      *
-     * @param builder an instance of {@link RecommendationsRequestBuilder} that will be turned into a request
+     * @param builder an instance of {@link ItemRecGetTopNRequestBuilder} that will be turned into a request
      */
-    public FutureAPIResponse getRecommendationsAsFuture(RecommendationsRequestBuilder builder) throws IOException {
+    public FutureAPIResponse getItemRecTopNAsFuture(ItemRecGetTopNRequestBuilder builder) throws IOException {
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
 
@@ -561,30 +484,30 @@ public class Client {
      * @param uid ID of the User whose recommendations will be gotten
      * @param n number of top recommendations to get
      */
-    public String[] getRecommendations(String engine, String uid, int n) throws ExecutionException, InterruptedException, IOException {
-        return this.getRecommendations(this.getRecommendationsAsFuture(this.getRecommendationsRequestBuilder(engine, uid, n)));
+    public String[] getItemRecTopN(String engine, String uid, int n) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRecTopN(this.getItemRecTopNAsFuture(this.getItemRecGetTopNRequestBuilder(engine, uid, n)));
     }
 
     /**
      * Sends a synchronous get recommendations request to the API.
      *
-     * @param builder an instance of {@link RecommendationsRequestBuilder} that will be turned into a request
+     * @param builder an instance of {@link ItemRecGetTopNRequestBuilder} that will be turned into a request
      */
-    public String[] getRecommendations(RecommendationsRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
-        return this.getRecommendations(this.getRecommendationsAsFuture(builder));
+    public String[] getItemRecTopN(ItemRecGetTopNRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRecTopN(this.getItemRecTopNAsFuture(builder));
     }
 
     /**
      * Synchronize a previously sent asynchronous get recommendations request.
      *
-     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getRecommendationsAsFuture}
+     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getItemRecTopNAsFuture}
      */
-    public String[] getRecommendations(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+    public String[] getItemRecTopN(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         // Do not use getStatus/getMessage directly as they do not pass exceptions
         int status = response.get().getStatus();
         String message = response.get().getMessage();
 
-        if (status == this.HTTP_OK) {
+        if (status == Client.HTTP_OK) {
             JsonObject messageAsJson = (JsonObject) parser.parse(message);
             JsonArray iidsAsJson = messageAsJson.getAsJsonArray("iids");
             return this.jsonArrayAsStringArray(iidsAsJson);
@@ -593,63 +516,12 @@ public class Client {
         }
     }
 
-    /**
-     * Future functionality.
-     */
-    public SimilarRequestBuilder getSimilarRequestBuilder(String iid, int n) {
-        return new SimilarRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, iid, n);
-    }
+    private void userActionItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
 
-    /**
-     * Future functionality.
-     */
-    public FutureAPIResponse getSimilarAsFuture(SimilarRequestBuilder builder) throws IOException {
-        return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
-    }
-
-    /**
-     * Future functionality.
-     */
-    public String[] getSimilar(String iid, int n) throws IOException {
-        return this.getSimilar(this.getSimilarAsFuture(this.getSimilarRequestBuilder(iid, n)));
-    }
-
-    /**
-     * Future functionality.
-     */
-    public String[] getSimilar(SimilarRequestBuilder builder) throws IOException {
-        return this.getSimilar(this.getSimilarAsFuture(builder));
-    }
-
-    /**
-     * Future functionality.
-     */
-    public String[] getSimilar(FutureAPIResponse response) {
-        int status = response.getStatus();
-
-        if (status == this.HTTP_OK) {
-            String message = response.getMessage();
-            try {
-                //New implementation using gson
-                JsonParser parser = new JsonParser();
-                JsonObject messageAsJson = (JsonObject) parser.parse(message);
-                JsonArray iidsAsJson = messageAsJson.getAsJsonArray("iids");
-                return this.jsonArrayAsStringArray(iidsAsJson);
-            } catch (JsonParseException e) {
-                if (logger.isDebugEnabled()) {
-                    logger.error("JsonParseException occurred trying to get getSimilar");
-                    logger.error(e.getMessage());
-                }
-                return new String[0];
-            } catch (Exception e) {
-                if (logger.isDebugEnabled()) {
-                    logger.error("General Exception occurred trying to get getSimilar");
-                    logger.error(e.getMessage());
-                }
-                return new String[0];
-            }
-        } else {
-            return new String[0];
+        if (status != Client.HTTP_CREATED) {
+            throw new IOException(message);
         }
     }
 
@@ -682,8 +554,8 @@ public class Client {
      * @param iid ID of the Item of this action
      * @param rate the rating of this action
      */
-    public boolean userRateItem(String uid, String iid, int rate) throws IOException {
-        return this.userRateItem(this.userRateItemAsFuture(this.getUserRateItemRequestBuilder(uid, iid, rate)));
+    public void userRateItem(String uid, String iid, int rate) throws ExecutionException, InterruptedException, IOException {
+        this.userRateItem(this.userRateItemAsFuture(this.getUserRateItemRequestBuilder(uid, iid, rate)));
     }
 
     /**
@@ -691,8 +563,8 @@ public class Client {
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
-    public boolean userRateItem(UserActionItemRequestBuilder builder) throws IOException {
-        return this.userRateItem(this.userRateItemAsFuture(builder));
+    public void userRateItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        this.userRateItem(this.userRateItemAsFuture(builder));
     }
 
     /**
@@ -700,12 +572,8 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userRateItemAsFuture}
      */
-    public boolean userRateItem(FutureAPIResponse response) {
-        if (response.getStatus() == this.HTTP_CREATED) {
-            return true;
-        } else {
-            return false;
-        }
+    public void userRateItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        this.userActionItem(response);
     }
 
     /**
@@ -733,8 +601,8 @@ public class Client {
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
      */
-    public boolean userLikeItem(String uid, String iid) throws IOException {
-        return this.userLikeItem(this.userLikeItemAsFuture(this.getUserLikeItemRequestBuilder(uid, iid)));
+    public void userLikeItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
+        this.userLikeItem(this.userLikeItemAsFuture(this.getUserLikeItemRequestBuilder(uid, iid)));
     }
 
     /**
@@ -742,8 +610,8 @@ public class Client {
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
-    public boolean userLikeItem(UserActionItemRequestBuilder builder) throws IOException {
-        return this.userLikeItem(this.userLikeItemAsFuture(builder));
+    public void userLikeItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        this.userLikeItem(this.userLikeItemAsFuture(builder));
     }
 
     /**
@@ -751,12 +619,8 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userLikeItemAsFuture}
      */
-    public boolean userLikeItem(FutureAPIResponse response) {
-        if (response.getStatus() == this.HTTP_CREATED) {
-            return true;
-        } else {
-            return false;
-        }
+    public void userLikeItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        this.userActionItem(response);
     }
 
     /**
@@ -784,8 +648,8 @@ public class Client {
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
      */
-    public boolean userDislikeItem(String uid, String iid) throws IOException {
-        return this.userDislikeItem(this.userDislikeItemAsFuture(this.getUserDislikeItemRequestBuilder(uid, iid)));
+    public void userDislikeItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
+        this.userDislikeItem(this.userDislikeItemAsFuture(this.getUserDislikeItemRequestBuilder(uid, iid)));
     }
 
     /**
@@ -793,8 +657,8 @@ public class Client {
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
-    public boolean userDislikeItem(UserActionItemRequestBuilder builder) throws IOException {
-        return this.userDislikeItem(this.userDislikeItemAsFuture(builder));
+    public void userDislikeItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        this.userDislikeItem(this.userDislikeItemAsFuture(builder));
     }
 
     /**
@@ -802,12 +666,8 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userDislikeItemAsFuture}
      */
-    public boolean userDislikeItem(FutureAPIResponse response) {
-        if (response.getStatus() == this.HTTP_CREATED) {
-            return true;
-        } else {
-            return false;
-        }
+    public void userDislikeItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        this.userActionItem(response);
     }
 
     /**
@@ -835,8 +695,8 @@ public class Client {
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
      */
-    public boolean userViewItem(String uid, String iid) throws IOException {
-        return this.userViewItem(this.userViewItemAsFuture(this.getUserViewItemRequestBuilder(uid, iid)));
+    public void userViewItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
+        this.userViewItem(this.userViewItemAsFuture(this.getUserViewItemRequestBuilder(uid, iid)));
     }
 
     /**
@@ -844,8 +704,8 @@ public class Client {
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
-    public boolean userViewItem(UserActionItemRequestBuilder builder) throws IOException {
-        return this.userViewItem(this.userViewItemAsFuture(builder));
+    public void userViewItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        this.userViewItem(this.userViewItemAsFuture(builder));
     }
 
     /**
@@ -853,12 +713,8 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userViewItemAsFuture}
      */
-    public boolean userViewItem(FutureAPIResponse response) {
-        if (response.getStatus() == this.HTTP_CREATED) {
-            return true;
-        } else {
-            return false;
-        }
+    public void userViewItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        this.userActionItem(response);
     }
 
     /**
@@ -886,8 +742,8 @@ public class Client {
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
      */
-    public boolean userConversionItem(String uid, String iid) throws IOException {
-        return this.userConversionItem(this.userConversionItemAsFuture(this.getUserConversionItemRequestBuilder(uid, iid)));
+    public void userConversionItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
+        this.userConversionItem(this.userConversionItemAsFuture(this.getUserConversionItemRequestBuilder(uid, iid)));
     }
 
     /**
@@ -895,8 +751,8 @@ public class Client {
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
-    public boolean userConversionItem(UserActionItemRequestBuilder builder) throws IOException {
-        return this.userConversionItem(this.userConversionItemAsFuture(builder));
+    public void userConversionItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        this.userConversionItem(this.userConversionItemAsFuture(builder));
     }
 
     /**
@@ -904,12 +760,8 @@ public class Client {
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userConversionItemAsFuture}
      */
-    public boolean userConversionItem(FutureAPIResponse response) {
-        if (response.getStatus() == this.HTTP_CREATED) {
-            return true;
-        } else {
-            return false;
-        }
+    public void userConversionItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        this.userActionItem(response);
     }
 }
 
