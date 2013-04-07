@@ -7,8 +7,8 @@ import com.ning.http.client.RequestBuilder;
  * Get top n recommendations request builder for item recommendation engine
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.3.1
- * @since 0.3.1
+ * @version 0.4
+ * @since 0.4
  */
 
 public class ItemRecGetTopNRequestBuilder {
