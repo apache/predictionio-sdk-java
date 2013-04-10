@@ -90,6 +90,13 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/openudid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/openudid"
+        android:textIsSelectable="true" />
+
+    <TextView
         android:id="@+id/console_output"
         android:layout_width="match_parent"
         android:layout_height="0dp"

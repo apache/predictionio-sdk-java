@@ -2,6 +2,7 @@ package io.prediction.samples.androidclient;
 
 import io.prediction.Client;
 
+import org.OpenUDID.OpenUDID_manager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -96,6 +97,25 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	// Log a user-view-item action
+	private class OpenUDIDTask extends AsyncTask<Void, Void, String> {
+		protected String doInBackground(Void... v) {
+			try {
+				while (!OpenUDID_manager.isInitialized()) {
+					Thread.sleep(1000);
+				}
+			} catch (Exception e) {
+				return ExceptionUtils.getStackTrace(e);
+			}
+			return OpenUDID_manager.getOpenUDID();
+		}
+
+		protected void onPostExecute(String result) {
+			TextView console = (TextView) findViewById(R.id.openudid);
+			console.setText("OpenUDID: "+result);
+		}
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -108,6 +128,8 @@ public class MainActivity extends Activity {
 		engine.setText("test");
 		uid.setText("1");
 		n.setText("10");
+		OpenUDID_manager.sync(this);
+		new OpenUDIDTask().execute();
 	}
 
 	@Override

@@ -12,5 +12,6 @@
     <string name="uid">UID</string>
     <string name="iid">IID</string>
     <string name="n">#</string>
+    <string name="openudid">OpenUDID</string>
     
 </resources>
