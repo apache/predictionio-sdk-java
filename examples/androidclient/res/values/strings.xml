@@ -8,7 +8,9 @@
     <string name="app_key">App Key</string>
     <string name="engine">Engine</string>
     <string name="button_get_recs">Get Recs</string>
+    <string name="button_save_view">Save View</string>
     <string name="uid">UID</string>
+    <string name="iid">IID</string>
     <string name="n">#</string>
     
 </resources>

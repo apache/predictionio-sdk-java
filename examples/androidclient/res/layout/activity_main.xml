@@ -64,6 +64,31 @@
             android:text="@string/button_get_recs" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/view_uid"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/uid" />
+
+        <EditText
+            android:id="@+id/view_iid"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/iid" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="saveView"
+            android:text="@string/button_save_view" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/console_output"
         android:layout_width="match_parent"

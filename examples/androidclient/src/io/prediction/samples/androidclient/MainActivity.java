@@ -69,6 +69,33 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	// Log a user-view-item action
+	private class SaveViewTask extends AsyncTask<Void, Void, String> {
+		protected String doInBackground(Void... v) {
+			EditText appKey = (EditText) findViewById(R.id.app_key);
+			EditText apiUrl = (EditText) findViewById(R.id.api_url);
+			EditText uid = (EditText) findViewById(R.id.view_uid);
+			EditText iid = (EditText) findViewById(R.id.view_iid);
+			client.setAppkey(appKey.getText().toString());
+			client.setApiUrl(apiUrl.getText().toString());
+			String result = "";
+			try {
+				String suid = uid.getText().toString();
+				String siid = iid.getText().toString();
+				client.userViewItem(suid, siid);
+				result = "Logged UID "+suid+" view IID "+siid;
+			} catch (Exception e) {
+				result = ExceptionUtils.getStackTrace(e);
+			}
+			return result;
+		}
+
+		protected void onPostExecute(String result) {
+			TextView console = (TextView) findViewById(R.id.console_output);
+			console.setText(result);
+		}
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -94,13 +121,13 @@ public class MainActivity extends Activity {
 		System.setProperty("java.net.preferIPv6Addresses", "false");
 		client = new Client("", apiUrl.getText().toString(), 10);
 	}
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
 		client.close();
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -115,6 +142,10 @@ public class MainActivity extends Activity {
 
 	public void getRecs(View view) {
 		new RecsTask().execute();
+	}
+
+	public void saveView(View view) {
+		new SaveViewTask().execute();
 	}
 
 }
