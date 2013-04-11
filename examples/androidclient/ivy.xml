@@ -17,7 +17,7 @@
         <dependency
             name="client"
             org="io.prediction"
-            rev="0.4-SNAPSHOT" />
+            rev="0.4" />
     </dependencies>
 
 </ivy-module>
