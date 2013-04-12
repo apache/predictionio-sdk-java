@@ -64,6 +64,10 @@ If you have not already cloned the repository from the section above, do
     cd ~
     git clone git://github.com/PredictionIO/PredictionIO-Java-SDK.git
 
+### Running the Sample Android Client
+
+Detailed instructions can be found at our [main documentation site](http://docs.prediction.io/tutorials/android-client.html).
+
 ### Building
 
 If your PredictionIO server is not at localhost, edit the source and replace API URLs with your PredictionIO server host.
@@ -97,7 +101,7 @@ Then, you can run the sample client of various tasks:
 Enjoy!
 
 Support
-=========
+=======
 
 Forum
 -----
