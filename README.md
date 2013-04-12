@@ -68,7 +68,9 @@ If you have not already cloned the repository from the section above, do
 
 Detailed instructions can be found at our [main documentation site](http://docs.prediction.io/tutorials/android-client.html).
 
-### Building
+### Running CLI Examples
+
+#### Building
 
 If your PredictionIO server is not at localhost, edit the source and replace API URLs with your PredictionIO server host.
 
@@ -82,7 +84,7 @@ Run the following in each example's directory, e.g.
 
 These will create JAR files with all dependencies built in.
 
-### Try It Now
+#### Try It Now
 
 First, you need to create an Application on PredictionIO and obtain an appkey.
 
