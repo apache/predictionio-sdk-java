@@ -7,7 +7,7 @@ import com.ning.http.client.RequestBuilder;
  * Get top n recommendations request builder for item recommendation engine
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.4
+ * @version 0.4.1
  * @since 0.4
  */
 
@@ -23,6 +23,7 @@ public class ItemRecGetTopNRequestBuilder {
     private Double longitude;
     private Double within;
     private String unit;
+    private String[] attributes;
 
     /**
      * Instantiate a request builder with mandatory arguments.
@@ -110,6 +111,16 @@ public class ItemRecGetTopNRequestBuilder {
     }
 
     /**
+     * Add the "attributes" optional argument to the request.
+     *
+     * @param attributes array of item attribute names to be returned with the result
+     */
+    public ItemRecGetTopNRequestBuilder attributes(String[] attributes) {
+        this.attributes = attributes;
+        return this;
+    }
+
+    /**
      * Build a request.
      * <p>
      * Do not use this directly. Please refer to "See Also".
@@ -124,7 +135,7 @@ public class ItemRecGetTopNRequestBuilder {
         builder.addQueryParameter("uid", this.uid);
         builder.addQueryParameter("n", Integer.toString(this.n));
         if (this.itypes != null && this.itypes.length > 0) {
-            builder.addQueryParameter("itypes", Utils.itypesAsString(this.itypes));
+            builder.addQueryParameter("itypes", Utils.arrayToString(this.itypes));
         }
         if (this.latitude != null && this.longitude != null) {
             builder.addQueryParameter("latlng", this.latitude.toString() + "," + this.longitude.toString());
@@ -134,6 +145,9 @@ public class ItemRecGetTopNRequestBuilder {
         }
         if (this.unit != null) {
             builder.addQueryParameter("unit", this.unit.toString());
+        }
+        if (this.attributes != null && this.attributes.length > 0) {
+            builder.addQueryParameter("attributes", Utils.arrayToString(this.attributes));
         }
         return builder.build();
     }

@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
  * Class to build Item requests
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.3
+ * @version 0.4.1
  * @since 0.2
  */
 
@@ -56,7 +56,7 @@ public class CreateItemRequestBuilder {
         builder.setUrl(this.apiUrl + "/items." + this.apiFormat);
         builder.addQueryParameter("appkey", this.appkey);
         builder.addQueryParameter("iid", this.iid);
-        builder.addQueryParameter("itypes", Utils.itypesAsString(this.itypes));
+        builder.addQueryParameter("itypes", Utils.arrayToString(this.itypes));
         if (this.latitude != null && this.longitude != null) {
             builder.addQueryParameter("latlng", this.latitude.toString() + "," + this.longitude.toString());
         }
