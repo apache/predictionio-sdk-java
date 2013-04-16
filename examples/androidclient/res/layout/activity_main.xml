@@ -11,7 +11,9 @@
         android:id="@+id/app_key"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/app_key" />
+        android:hint="@string/app_key"
+        android:lines="1"
+        android:singleLine="true" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,7 +25,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/api_url"
-            android:inputType="textUri" />
+            android:inputType="textUri"
+            android:lines="1"
+            android:singleLine="true" />
 
         <Button
             android:layout_width="wrap_content"
@@ -31,6 +35,11 @@
             android:onClick="getStatus"
             android:text="@string/button_get_status" />
     </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:background="#80000000" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,21 +50,41 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/engine" />
+            android:hint="@string/engine"
+            android:lines="1"
+            android:singleLine="true" />
 
         <EditText
             android:id="@+id/uid"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/uid" />
+            android:hint="@string/uid"
+            android:lines="1"
+            android:singleLine="true" />
 
         <EditText
             android:id="@+id/n"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="@string/n"
-            android:inputType="number" />
+            android:inputType="number"
+            android:lines="1"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/attributes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/attributes"
+            android:lines="1"
+            android:singleLine="true" />
 
         <Button
             android:layout_width="wrap_content"
@@ -63,6 +92,11 @@
             android:onClick="getRecs"
             android:text="@string/button_get_recs" />
     </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:background="#80000000" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -73,14 +107,18 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/uid" />
+            android:hint="@string/uid"
+            android:lines="1"
+            android:singleLine="true" />
 
         <EditText
             android:id="@+id/view_iid"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/iid" />
+            android:hint="@string/iid"
+            android:lines="1"
+            android:singleLine="true" />
 
         <Button
             android:layout_width="wrap_content"
@@ -89,12 +127,22 @@
             android:text="@string/button_save_view" />
     </LinearLayout>
 
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:background="#80000000" />
+
     <TextView
         android:id="@+id/openudid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/openudid"
         android:textIsSelectable="true" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:background="#80000000" />
 
     <TextView
         android:id="@+id/console_output"

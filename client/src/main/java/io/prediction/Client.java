@@ -1,6 +1,7 @@
 package io.prediction;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
@@ -11,6 +12,9 @@ import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -22,7 +26,7 @@ import java.util.concurrent.ExecutionException;
  * Multiple simultaneous asynchronous requests is made possible by the high performance backend provided by the <a href="https://github.com/AsyncHttpClient/async-http-client">Async Http Client</a>.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.4
+ * @version 0.4.1
  * @since 0.1
  */
 public class Client {
@@ -136,7 +140,12 @@ public class Client {
         int l = a.size();
         String[] r = new String[l];
         for (int i = 0; i < l; i++) {
-            r[i] = a.get(i).getAsString();
+            JsonElement e = a.get(i);
+            if (e.isJsonNull()) {
+                r[i] = null;
+            } else {
+                r[i] = e.getAsString();
+            }
         }
         return r;
     }
@@ -529,6 +538,18 @@ public class Client {
     }
 
     /**
+     * Get a get top-n recommendations request builder that can be used to add additional request parameters.
+     *
+     * @param engine engine name
+     * @param uid ID of the User whose recommendations will be gotten
+     * @param n number of top recommendations to get
+     * @param attributes array of item attribute names to be returned with the result
+     */
+    public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, String uid, int n, String[] attributes) {
+        return (new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n)).attributes(attributes);
+    }
+
+    /**
      * Sends an asynchronous get recommendations request to the API.
      *
      * @param builder an instance of {@link ItemRecGetTopNRequestBuilder} that will be turned into a request
@@ -583,6 +604,61 @@ public class Client {
             JsonObject messageAsJson = (JsonObject) parser.parse(message);
             JsonArray iidsAsJson = messageAsJson.getAsJsonArray("iids");
             return this.jsonArrayAsStringArray(iidsAsJson);
+        } else {
+            throw new IOException(message);
+        }
+    }
+
+    /**
+     * Sends a synchronous get recommendations request to the API.
+     *
+     * @param engine engine name
+     * @param uid ID of the User whose recommendations will be gotten
+     * @param n number of top recommendations to get
+     * @param attributes array of item attribute names to be returned with the result
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRecTopNWithAttributes(String engine, String uid, int n, String[] attributes) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRecTopNWithAttributes(this.getItemRecTopNAsFuture(this.getItemRecGetTopNRequestBuilder(engine, uid, n, attributes)));
+    }
+
+    /**
+     * Sends a synchronous get recommendations request to the API.
+     *
+     * @param builder an instance of {@link ItemRecGetTopNRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRecTopNWithAttributes(ItemRecGetTopNRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRecTopNWithAttributes(this.getItemRecTopNAsFuture(builder));
+    }
+
+    /**
+     * Synchronize a previously sent asynchronous get recommendations request.
+     *
+     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getItemRecTopNAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRecTopNWithAttributes(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        // Do not use getStatus/getMessage directly as they do not pass exceptions
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
+
+        if (status == Client.HTTP_OK) {
+            HashMap<String, String[]> results = new HashMap();
+            JsonObject messageAsJson = (JsonObject) parser.parse(message);
+            for (Map.Entry<String, JsonElement> member : messageAsJson.entrySet()) {
+                results.put(member.getKey(), this.jsonArrayAsStringArray(member.getValue().getAsJsonArray()));
+            }
+            return results;
         } else {
             throw new IOException(message);
         }

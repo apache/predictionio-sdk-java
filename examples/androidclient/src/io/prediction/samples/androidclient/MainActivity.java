@@ -1,6 +1,10 @@
 package io.prediction.samples.androidclient;
 
 import io.prediction.Client;
+import io.prediction.ItemRecGetTopNRequestBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.OpenUDID.OpenUDID_manager;
 import org.apache.commons.lang3.StringUtils;
@@ -43,30 +47,47 @@ public class MainActivity extends Activity {
 	}
 
 	// Get recommendations async task
-	private class RecsTask extends AsyncTask<Void, Void, String> {
-		protected String doInBackground(Void... v) {
+	private class RecsTask extends AsyncTask<Void, Void, Map<String, String[]>> {
+		protected Map<String, String[]> doInBackground(Void... v) {
 			EditText appKey = (EditText) findViewById(R.id.app_key);
 			EditText apiUrl = (EditText) findViewById(R.id.api_url);
 			EditText engine = (EditText) findViewById(R.id.engine);
 			EditText uid = (EditText) findViewById(R.id.uid);
 			EditText n = (EditText) findViewById(R.id.n);
+			EditText attributes = (EditText) findViewById(R.id.attributes);
 			client.setAppkey(appKey.getText().toString());
 			client.setApiUrl(apiUrl.getText().toString());
-			String result = "";
+			Map<String, String[]> results = new HashMap<String, String[]>();
 			try {
-				String[] iids = client.getItemRecTopN(engine.getText()
-						.toString(), uid.getText().toString(), Integer
-						.parseInt(n.getText().toString()));
-				result = StringUtils.join(iids, ",");
+				// Use a builder to insert optional parameter
+				ItemRecGetTopNRequestBuilder builder = client
+						.getItemRecGetTopNRequestBuilder(engine.getText()
+								.toString(), uid.getText().toString(), Integer
+								.parseInt(n.getText().toString()));
+
+				if (!isEmpty(attributes)) {
+					// Include custom attributes in results
+					String[] attributesToGet = attributes.getText().toString()
+							.split(",");
+					builder.attributes(attributesToGet);
+					results = client.getItemRecTopNWithAttributes(builder);
+				} else {
+					results.put("iids", client.getItemRecTopN(builder));
+				}
 			} catch (Exception e) {
-				result = ExceptionUtils.getStackTrace(e);
+				String[] error = { ExceptionUtils.getStackTrace(e) };
+				results.put("error", error);
 			}
-			return result;
+			return results;
 		}
 
-		protected void onPostExecute(String result) {
+		protected void onPostExecute(Map<String, String[]> result) {
 			TextView console = (TextView) findViewById(R.id.console_output);
-			console.setText(result);
+			String display = "";
+			for (Map.Entry<String, String[]> entry : result.entrySet()) {
+				display += entry.getKey() + ": " + StringUtils.join(entry.getValue(), ",") + "\n";
+			}
+			console.setText(display);
 		}
 	}
 
@@ -84,7 +105,7 @@ public class MainActivity extends Activity {
 				String suid = uid.getText().toString();
 				String siid = iid.getText().toString();
 				client.userViewItem(suid, siid);
-				result = "Logged UID "+suid+" view IID "+siid;
+				result = "Logged UID " + suid + " view IID " + siid;
 			} catch (Exception e) {
 				result = ExceptionUtils.getStackTrace(e);
 			}
@@ -112,7 +133,7 @@ public class MainActivity extends Activity {
 
 		protected void onPostExecute(String result) {
 			TextView console = (TextView) findViewById(R.id.openudid);
-			console.setText("OpenUDID: "+result);
+			console.setText("OpenUDID: " + result);
 		}
 	}
 
@@ -170,4 +191,11 @@ public class MainActivity extends Activity {
 		new SaveViewTask().execute();
 	}
 
+	private boolean isEmpty(EditText etText) {
+		if (etText.getText().toString().trim().length() > 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 }
