@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.prediction.samples</groupId>
     <artifactId>sample-import</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.4.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>PredictionIO Java SDK Examples: Import</name>
 
@@ -11,7 +11,7 @@
         <dependency>
             <groupId>io.prediction</groupId>
             <artifactId>client</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.4.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

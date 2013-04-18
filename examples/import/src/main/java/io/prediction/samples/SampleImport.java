@@ -94,12 +94,14 @@ public class SampleImport {
             String[] itypes = {"movies"};
             for (Iterator iidIter = iids.iterator(); iidIter.hasNext();) {
                 String iid = (String)iidIter.next();
-                rs.add(client.createItemAsFuture(client.getCreateItemRequestBuilder(iid, itypes)));
+                rs.add(client.createItemAsFuture(client.getCreateItemRequestBuilder(iid, itypes).attribute("url", "http://localhost/"+iid+".html").attribute("startT", "ignored")));
             }
 
             /* Synchronize all requests before the program exits */
             for (FutureAPIResponse r : rs) {
-                r.getMessage();
+                if (r.getStatus() != 201) {
+                    System.err.println(r.getMessage());
+                }
             }
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
