@@ -125,6 +125,14 @@ public class CreateItemRequestBuilder {
         return this;
     }
 
+    /**
+     * Build a request.
+     * <p>
+     * Do not use this directly. Please refer to "See Also".
+     *
+     * @see Client#createItem(CreateItemRequestBuilder)
+     * @see Client#createItemAsFuture(CreateItemRequestBuilder)
+     */
     public Request build() {
         RequestBuilder builder = new RequestBuilder("POST");
         builder.setUrl(this.apiUrl + "/items." + this.apiFormat);

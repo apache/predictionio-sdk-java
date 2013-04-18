@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * TappingStone implementation of Java Utility Concurrent Future
+ * APIResponse as a future.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
  * @version 0.2

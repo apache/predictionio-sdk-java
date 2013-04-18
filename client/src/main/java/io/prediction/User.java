@@ -6,7 +6,7 @@ import org.joda.time.DateTime;
  * User class for PredictionIO User objects
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.3
+ * @version 0.4.2
  * @since 0.2
  */
 
@@ -16,37 +16,86 @@ public class User {
     private Double longitude;
     private DateTime created;
 
+    /**
+     * Instantiate a user object with its ID.
+     *
+     * @param uid the user ID
+     */
     public User(String uid) {
         this.uid = uid;
     }
 
+    /**
+     * Add the "latitude" optional argument to the user.
+     * <p>
+     * Only certain data backend support geospatial indexing.
+     * Please refer to the main documentation for more information.
+     *
+     * @param latitude latitude
+     */
     public User latitude(Double latitude) {
         this.latitude = latitude;
         return this;
     }
 
+    /**
+     * Add the "longitude" optional argument to the user.
+     * <p>
+     * Only certain data backend support geospatial indexing.
+     * Please refer to the main documentation for more information.
+     *
+     * @param longitude longitude
+     */
     public User longitude(Double longitude) {
         this.longitude = longitude;
         return this;
     }
 
+    /**
+     * Set the creation time of the user.
+     * <p>
+     * This is a system attribute.
+     * Changing the value here will not change the value in the system.
+     *
+     * @param created creation time of the user
+     */
     public User created(DateTime created) {
         this.created = created;
         return this;
     }
 
+    /**
+     * Get the ID of this user.
+     */
     public String getUid() {
         return this.uid;
     }
 
+    /**
+     * Get the optional latitude attribute of this user.
+     * <p>
+     * Only certain data backend support geospatial indexing.
+     * Please refer to the main documentation for more information.
+     */
     public Double getLatitude() {
         return this.latitude;
     }
 
+    /**
+     * Get the optional longitude attribute of this user.
+     * <p>
+     * Only certain data backend support geospatial indexing.
+     * Please refer to the main documentation for more information.
+     */
     public Double getLongitude() {
         return this.longitude;
     }
 
+    /**
+     * Get the creation time of this user.
+     * <p>
+     * This is a system attribute and cannot be modified.
+     */
     public DateTime getCreated() {
         return this.created;
     }
