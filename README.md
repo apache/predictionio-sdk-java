@@ -79,7 +79,7 @@ Run the following in each example's directory, e.g.
 
     cd ~/PredictionIO-Java-SDK/examples/import
     mvn clean compile assembly:single
-    cd ~/PredictionIO-Java-SDK/examples/client
+    cd ~/PredictionIO-Java-SDK/examples/simpletasks1
     mvn clean compile assembly:single
 
 These will create JAR files with all dependencies built in.
