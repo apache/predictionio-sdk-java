@@ -69,42 +69,16 @@ public class SampleImport {
                 iids.add(iid);
 
                 /* Send out async request */
-                client.identify(uid);
+                FutureAPIResponse r = client.userRateItemAsFuture(client.getUserRateItemRequestBuilder(uid, iid, rate));
 
-                int j;
-                for (j=0; j<5; j++) {
-                    FutureAPIResponse r;
- 
-                    // create all types of actions for testing purpose
-                    switch (j) {
-                        case 0: 
-                            r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("view", iid));
-                            break;
-                        case 1: 
-                            r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("like", iid));
-                            break;
-                        case 2: 
-                            r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("dislike", iid));
-                            break;
-                        case 3: 
-                            r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("conversion", iid));
-                            break;
-                        default:
-                            r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("rate", iid).rate(rate));
-                            break;
-                    }
-                    
-                    /* Add async handler to array for synchronization later */
-                    rs.add(r);
-                    i++;
+                /* Add async handler to array for synchronization later */
+                rs.add(r);
+                i++;
 
-                    /* Print status per 2000 requests */
-                    if (i % 2000 == 0) {
-                        System.out.println("Sent "+i+" requests so far");
-                    }
-
+                /* Print status per 2000 requests */
+                if (i % 2000 == 0) {
+                    System.out.println("Sent "+i+" requests so far");
                 }
-
             }
 
             dstream.close();

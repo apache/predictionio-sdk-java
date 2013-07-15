@@ -538,7 +538,7 @@ public class Client {
     }
 
     /**
-     * Get a get top-n recommendations request builder that can be used to add additional request parameters.
+     * Deprecated. Get a get top-n recommendations request builder that can be used to add additional request parameters.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
@@ -565,7 +565,7 @@ public class Client {
     }
 
     /**
-     * Get a get top-n recommendations request builder that can be used to add additional request parameters.
+     * Deprecated. Get a get top-n recommendations request builder that can be used to add additional request parameters.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
@@ -603,7 +603,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous get recommendations request to the API.
+     * Deprecated. Sends a synchronous get recommendations request to the API.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
@@ -670,7 +670,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous get recommendations request to the API.
+     * Deprecated. Sends a synchronous get recommendations request to the API.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten

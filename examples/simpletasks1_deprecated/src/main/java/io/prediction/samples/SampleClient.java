@@ -42,8 +42,7 @@ public class SampleClient {
         // Try recommendations
         System.out.print("10 recommendations for User ID 1:");
         try {
-            client.identify("1");
-            for (String iid : client.getItemRecTopN(engine, 10)) {
+            for (String iid : client.getItemRecTopN(engine, "1", 10)) {
                 System.out.print(" " + iid);
             }
         } catch (Exception e) {
@@ -54,8 +53,7 @@ public class SampleClient {
         // Try similar items
         System.out.print("5 recommendations for User ID 2:");
         try {
-            client.identify("2");
-            for (String iid : client.getItemRecTopN(engine, 5)) {
+            for (String iid : client.getItemRecTopN(engine, "2", 5)) {
                 System.out.print(" " + iid);
             }
         } catch (Exception e) {
