@@ -14,7 +14,6 @@ public class User {
     private String uid;
     private Double latitude;
     private Double longitude;
-    private DateTime created;
 
     /**
      * Instantiate a user object with its ID.
@@ -52,19 +51,6 @@ public class User {
     }
 
     /**
-     * Set the creation time of the user.
-     * <p>
-     * This is a system attribute.
-     * Changing the value here will not change the value in the system.
-     *
-     * @param created creation time of the user
-     */
-    public User created(DateTime created) {
-        this.created = created;
-        return this;
-    }
-
-    /**
      * Get the ID of this user.
      */
     public String getUid() {
@@ -91,12 +77,4 @@ public class User {
         return this.longitude;
     }
 
-    /**
-     * Get the creation time of this user.
-     * <p>
-     * This is a system attribute and cannot be modified.
-     */
-    public DateTime getCreated() {
-        return this.created;
-    }
 }

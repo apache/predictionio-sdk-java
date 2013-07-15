@@ -50,6 +50,9 @@ public class Client {
 
     private JsonParser parser = new JsonParser();
 
+    // internal field
+    private String uid = "";
+
     /**
      * Instantiate a PredictionIO RESTful API client using default values for API URL and thread limit.
      * <p>
@@ -105,6 +108,16 @@ public class Client {
      */
     public void close() {
         this.client.close();
+    }
+
+    /**
+     * Identify the user ID.
+     * This identified user ID will be used for creating user-action-on-item request or getting item recommendation.
+     *
+     * @param uid ID of the User to be identified
+     */
+    public void identify(String uid) {
+        this.uid = uid;
     }
 
     private AsyncHandler<APIResponse> getHandler() {
@@ -271,7 +284,7 @@ public class Client {
      * @param uid ID of the User to get
      */
     public FutureAPIResponse getUserAsFuture(String uid) throws IOException {
-        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/users/" + uid + "." + this.apiFormat).addQueryParameter("appkey", this.appkey).build();
+        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/users/" + uid + "." + this.apiFormat).addQueryParameter("pio_appkey", this.appkey).build();
         return new FutureAPIResponse(this.client.executeRequest(request, this.getHandler()));
     }
 
@@ -303,11 +316,10 @@ public class Client {
 
         if (status == Client.HTTP_OK) {
             JsonObject messageAsJson = (JsonObject) parser.parse(message);
-            String uid = messageAsJson.get("uid").getAsString();
+            String uid = messageAsJson.get("pio_uid").getAsString();
             User user = new User(uid);
-            user.created(new DateTime(messageAsJson.get("ct").getAsLong()));
-            if (messageAsJson.getAsJsonArray("latlng") != null) {
-                double latlng[] = this.jsonArrayAsDoubleArray(messageAsJson.getAsJsonArray("latlng"));
+            if (messageAsJson.getAsJsonArray("pio_latlng") != null) {
+                double latlng[] = this.jsonArrayAsDoubleArray(messageAsJson.getAsJsonArray("pio_latlng"));
                 user.latitude(new Double(latlng[0]));
                 user.longitude(new Double(latlng[1]));
             }
@@ -325,7 +337,7 @@ public class Client {
     public FutureAPIResponse deleteUserAsFuture(String uid) throws IOException {
         RequestBuilder builder = new RequestBuilder("DELETE");
         builder.setUrl(this.apiUrl + "/users/" + uid + "." + this.apiFormat);
-        builder.addQueryParameter("appkey", this.appkey);
+        builder.addQueryParameter("pio_appkey", this.appkey);
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
 
@@ -430,7 +442,7 @@ public class Client {
      * @param iid ID of the Item to get
      */
     public FutureAPIResponse getItemAsFuture(String iid) throws IOException {
-        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/items/" + iid + "." + this.apiFormat).addQueryParameter("appkey", this.appkey).build();
+        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/items/" + iid + "." + this.apiFormat).addQueryParameter("pio_appkey", this.appkey).build();
         return new FutureAPIResponse(this.client.executeRequest(request, this.getHandler()));
     }
 
@@ -462,18 +474,17 @@ public class Client {
 
         if (status == Client.HTTP_OK) {
             JsonObject messageAsJson = (JsonObject) parser.parse(message);
-            String iid = messageAsJson.get("iid").getAsString();
-            String[] itypes = this.jsonArrayAsStringArray(messageAsJson.getAsJsonArray("itypes"));
+            String iid = messageAsJson.get("pio_iid").getAsString();
+            String[] itypes = this.jsonArrayAsStringArray(messageAsJson.getAsJsonArray("pio_itypes"));
             Item item = new Item(iid, itypes);
-            item.created(new DateTime(messageAsJson.get("ct").getAsLong()));
-            if (messageAsJson.get("startT") != null) {
-                item.startT(new Date(messageAsJson.get("startT").getAsLong()));
+            if (messageAsJson.get("pio_startT") != null) {
+                item.startT(new Date(messageAsJson.get("pio_startT").getAsLong()));
             }
-            if (messageAsJson.get("endT") != null) {
-                item.endT(new Date(messageAsJson.get("endT").getAsLong()));
+            if (messageAsJson.get("pio_endT") != null) {
+                item.endT(new Date(messageAsJson.get("pio_endT").getAsLong()));
             }
-            if (messageAsJson.getAsJsonArray("latlng") != null) {
-                double latlng[] = this.jsonArrayAsDoubleArray(messageAsJson.getAsJsonArray("latlng"));
+            if (messageAsJson.getAsJsonArray("pio_latlng") != null) {
+                double latlng[] = this.jsonArrayAsDoubleArray(messageAsJson.getAsJsonArray("pio_latlng"));
                 item.latitude(new Double(latlng[0]));
                 item.longitude(new Double(latlng[1]));
             }
@@ -491,7 +502,7 @@ public class Client {
     public FutureAPIResponse deleteItemAsFuture(String iid) throws IOException {
         RequestBuilder builder = new RequestBuilder("DELETE");
         builder.setUrl(this.apiUrl + "/items/" + iid + "." + this.apiFormat);
-        builder.addQueryParameter("appkey", this.appkey);
+        builder.addQueryParameter("pio_appkey", this.appkey);
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
 
@@ -539,6 +550,22 @@ public class Client {
 
     /**
      * Get a get top-n recommendations request builder that can be used to add additional request parameters.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param n number of top recommendations to get
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     */
+    public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, int n) throws UnidentifiedUserException {
+        if (this.uid == "") {
+            throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
+        }
+        return new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, this.uid, n);
+    }
+
+    /**
+     * Get a get top-n recommendations request builder that can be used to add additional request parameters.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
@@ -547,6 +574,23 @@ public class Client {
      */
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, String uid, int n, String[] attributes) {
         return (new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n)).attributes(attributes);
+    }
+
+    /**
+     * Get a get top-n recommendations request builder that can be used to add additional request parameters.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param n number of top recommendations to get
+     * @param attributes array of item attribute names to be returned with the result
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     */
+    public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, int n, String[] attributes) throws UnidentifiedUserException {
+        if (this.uid == "") {
+            throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
+        }
+        return (new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, this.uid, n)).attributes(attributes);
     }
 
     /**
@@ -571,6 +615,22 @@ public class Client {
      */
     public String[] getItemRecTopN(String engine, String uid, int n) throws ExecutionException, InterruptedException, IOException {
         return this.getItemRecTopN(this.getItemRecTopNAsFuture(this.getItemRecGetTopNRequestBuilder(engine, uid, n)));
+    }
+
+    /**
+     * Sends a synchronous get recommendations request to the API.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param n number of top recommendations to get
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemRecTopN(String engine, int n) throws UnidentifiedUserException, ExecutionException, InterruptedException, IOException {
+        return this.getItemRecTopN(this.getItemRecTopNAsFuture(this.getItemRecGetTopNRequestBuilder(engine, n)));
     }
 
     /**
@@ -602,7 +662,7 @@ public class Client {
 
         if (status == Client.HTTP_OK) {
             JsonObject messageAsJson = (JsonObject) parser.parse(message);
-            JsonArray iidsAsJson = messageAsJson.getAsJsonArray("iids");
+            JsonArray iidsAsJson = messageAsJson.getAsJsonArray("pio_iids");
             return this.jsonArrayAsStringArray(iidsAsJson);
         } else {
             throw new IOException(message);
@@ -623,6 +683,23 @@ public class Client {
      */
     public Map<String, String[]> getItemRecTopNWithAttributes(String engine, String uid, int n, String[] attributes) throws ExecutionException, InterruptedException, IOException {
         return this.getItemRecTopNWithAttributes(this.getItemRecTopNAsFuture(this.getItemRecGetTopNRequestBuilder(engine, uid, n, attributes)));
+    }
+
+    /**
+     * Sends a synchronous get recommendations request to the API.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param n number of top recommendations to get
+     * @param attributes array of item attribute names to be returned with the result
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRecTopNWithAttributes(String engine, int n, String[] attributes) throws UnidentifiedUserException, ExecutionException, InterruptedException, IOException {
+        return this.getItemRecTopNWithAttributes(this.getItemRecTopNAsFuture(this.getItemRecGetTopNRequestBuilder(engine, n, attributes)));
     }
 
     /**
@@ -664,7 +741,84 @@ public class Client {
         }
     }
 
-    private void userActionItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+    /**
+     * Get a user-action-on-item request builder that can be used to add additional request parameters.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param action action name
+     * @param iid ID of the Item of this action
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     */
+    public UserActionItemRequestBuilder getUserActionItemRequestBuilder(String action, String iid) throws UnidentifiedUserException {
+        if (this.uid == "") {
+            throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
+        }
+        UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, action, this.uid, iid);
+        return builder;
+    }
+
+    /**
+     * Sends an asynchronous user-action-on-item request to the API.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param action action name
+     * @param iid ID of the Item of this action
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     */
+    public FutureAPIResponse userActionItemAsFuture(String action, String iid) throws UnidentifiedUserException, IOException {
+        return this.userActionItemAsFuture(this.getUserActionItemRequestBuilder(action, iid));
+    }
+
+    /**
+     * Sends an asynchronous user-action-on-item request to the API.
+     *
+     * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
+     */
+    public FutureAPIResponse userActionItemAsFuture(UserActionItemRequestBuilder builder) throws IOException {
+        return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
+    }
+
+    /**
+     * Sends a synchronous user-action-on-item request to the API.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param action action name
+     * @param iid ID of the Item of this action
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public void userActionItem(String action, String iid) throws UnidentifiedUserException, ExecutionException, InterruptedException, IOException {
+        this.userActionItem(this.userActionItemAsFuture(this.getUserActionItemRequestBuilder(action, iid)));
+    }
+
+    /**
+     * Sends a synchronous user-rate-item action request to the API.
+     *
+     * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public void userActionItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        this.userActionItem(this.userActionItemAsFuture(builder));
+    }
+
+    /**
+     * Synchronize a previously sent asynchronous user-action-on-item request.
+     *
+     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userRateItemAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public void userActionItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         int status = response.get().getStatus();
         String message = response.get().getMessage();
 
@@ -674,7 +828,7 @@ public class Client {
     }
 
     /**
-     * Get a user-rate-item action request builder that can be used to add additional request parameters.
+     * Deprecated. Get a user-rate-item action request builder that can be used to add additional request parameters.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -687,7 +841,7 @@ public class Client {
     }
 
     /**
-     * Sends an asynchronous user-rate-item action request to the API.
+     * Deprecated. Sends an asynchronous user-rate-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
@@ -696,7 +850,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous user-rate-item action request to the API.
+     * Deprecated. Sends a synchronous user-rate-item action request to the API.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -711,7 +865,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous user-rate-item action request to the API.
+     * Deprecated. Sends a synchronous user-rate-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      *
@@ -724,7 +878,7 @@ public class Client {
     }
 
     /**
-     * Synchronize a previously sent asynchronous user-rate-item action request.
+     * Deprecated. Synchronize a previously sent asynchronous user-rate-item action request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userRateItemAsFuture}
      *
@@ -737,7 +891,7 @@ public class Client {
     }
 
     /**
-     * Get a user-like-item action request builder that can be used to add additional request parameters.
+     * Deprecated. Get a user-like-item action request builder that can be used to add additional request parameters.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -747,7 +901,7 @@ public class Client {
     }
 
     /**
-     * Sends an asynchronous user-like-item action request to the API.
+     * Deprecated. Sends an asynchronous user-like-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
@@ -756,7 +910,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous user-like-item action request to the API.
+     * Deprecated. Sends a synchronous user-like-item action request to the API.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -770,7 +924,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous user-like-item action request to the API.
+     * Deprecated. Sends a synchronous user-like-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      *
@@ -783,7 +937,7 @@ public class Client {
     }
 
     /**
-     * Synchronize a previously sent asynchronous user-like-item action request.
+     * Deprecated. Synchronize a previously sent asynchronous user-like-item action request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userLikeItemAsFuture}
      *
@@ -796,7 +950,7 @@ public class Client {
     }
 
     /**
-     * Get a user-dislike-item action request builder that can be used to add additional request parameters.
+     * Deprecated. Get a user-dislike-item action request builder that can be used to add additional request parameters.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -806,7 +960,7 @@ public class Client {
     }
 
     /**
-     * Sends an asynchronous user-dislike-item action request to the API.
+     * Deprecated. Sends an asynchronous user-dislike-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
@@ -815,7 +969,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous user-dislike-item action request to the API.
+     * Deprecated. Sends a synchronous user-dislike-item action request to the API.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -829,7 +983,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous user-dislike-item action request to the API.
+     * Deprecated. Sends a synchronous user-dislike-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      *
@@ -842,7 +996,7 @@ public class Client {
     }
 
     /**
-     * Synchronize a previously sent asynchronous user-dislike-item action request.
+     * Deprecated. Synchronize a previously sent asynchronous user-dislike-item action request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userDislikeItemAsFuture}
      *
@@ -855,7 +1009,7 @@ public class Client {
     }
 
     /**
-     * Get a user-view-item action request builder that can be used to add additional request parameters.
+     * Deprecated. Get a user-view-item action request builder that can be used to add additional request parameters.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -865,7 +1019,7 @@ public class Client {
     }
 
     /**
-     * Sends an asynchronous user-view-item action request to the API.
+     * Deprecated. Sends an asynchronous user-view-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
@@ -874,7 +1028,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous user-view-item action request to the API.
+     * Deprecated. Sends a synchronous user-view-item action request to the API.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -888,7 +1042,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous user-view-item action request to the API.
+     * Deprecated. Sends a synchronous user-view-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      *
@@ -901,7 +1055,7 @@ public class Client {
     }
 
     /**
-     * Synchronize a previously sent asynchronous user-view-item action request.
+     * Deprecated. Synchronize a previously sent asynchronous user-view-item action request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userViewItemAsFuture}
      *
@@ -914,7 +1068,7 @@ public class Client {
     }
 
     /**
-     * Get a user-conversion-item action request builder that can be used to add additional request parameters.
+     * Deprecated. Get a user-conversion-item action request builder that can be used to add additional request parameters.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -924,7 +1078,7 @@ public class Client {
     }
 
     /**
-     * Sends an asynchronous user-conversion-item action request to the API.
+     * Deprecated. Sends an asynchronous user-conversion-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
@@ -933,7 +1087,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous user-conversion-item action request to the API.
+     * Deprecated. Sends a synchronous user-conversion-item action request to the API.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -947,7 +1101,7 @@ public class Client {
     }
 
     /**
-     * Sends a synchronous user-conversion-item action request to the API.
+     * Deprecated. Sends a synchronous user-conversion-item action request to the API.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      *
@@ -960,7 +1114,7 @@ public class Client {
     }
 
     /**
-     * Synchronize a previously sent asynchronous user-conversion-item action request.
+     * Deprecated. Synchronize a previously sent asynchronous user-conversion-item action request.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userConversionItemAsFuture}
      *

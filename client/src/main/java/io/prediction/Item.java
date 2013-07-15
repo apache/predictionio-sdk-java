@@ -19,7 +19,6 @@ public class Item {
     private Date endT;
     private Double latitude;
     private Double longitude;
-    private DateTime created;
 
     /**
      * Instantiate an item object with its ID and types.
@@ -79,19 +78,6 @@ public class Item {
     }
 
     /**
-     * Set the creation time of the item.
-     * <p>
-     * This is a system attribute.
-     * Changing the value here will not change the value in the system.
-     *
-     * @param created creation time of the item
-     */
-    public Item created(DateTime created) {
-        this.created = created;
-        return this;
-    }
-
-    /**
      * Get the ID of this item.
      */
     public String getIid() {
@@ -139,12 +125,4 @@ public class Item {
         return this.longitude;
     }
 
-    /**
-     * Get the creation time of this item.
-     * <p>
-     * This is a system attribute and cannot be modified.
-     */
-    public DateTime getCreated() {
-        return this.created;
-    }
 }

@@ -17,7 +17,7 @@ public class UserActionItemRequestBuilder {
     private String apiUrl;
     private String apiFormat;
     private String appkey;
-    private int action;
+    private String action;
     private String uid;
     private String iid;
     private DateTime t;
@@ -28,36 +28,29 @@ public class UserActionItemRequestBuilder {
     private int rate; // mandatory for u2i rate action
 
     /**
-     * Action code for a user-rate-item action
+     * Action name for a user-rate-item action
      */
-    public static final int RATE = 0;
+    public static final String RATE = "rate";
 
     /**
-     * Action code for a user-like-item action
+     * Action name for a user-like-item action
      */
-    public static final int LIKE = 1;
+    public static final String LIKE = "like";
 
     /**
-     * Action code for a user-dislike-item action
+     * Action name for a user-dislike-item action
      */
-    public static final int DISLIKE = 2;
+    public static final String DISLIKE = "dislike";
 
     /**
-     * Action code for a user-view-item action
+     * Action name for a user-view-item action
      */
-    public static final int VIEW = 3;
+    public static final String VIEW = "view";
 
     /**
-     * Action code for a user-view-details-item action
-     *
-     * @deprecated As of 0.2
+     * Action name for a user-conversion-item action
      */
-    public static final int VIEWDETAILS = 4;
-
-    /**
-     * Action code for a user-conversion-item action
-     */
-    public static final int CONVERSION = 5;
+    public static final String CONVERSION = "conversion";
 
     /**
      * Instantiate a request builder with mandatory arguments.
@@ -77,7 +70,7 @@ public class UserActionItemRequestBuilder {
      * @see Client#getUserViewItemRequestBuilder
      * @see Client#getUserConversionItemRequestBuilder
      */
-    public UserActionItemRequestBuilder(String apiUrl, String apiFormat, String appkey, int action, String uid, String iid) {
+    public UserActionItemRequestBuilder(String apiUrl, String apiFormat, String appkey, String action, String uid, String iid) {
         this.apiUrl = apiUrl;
         this.apiFormat = apiFormat;
         this.appkey = appkey;
@@ -145,38 +138,22 @@ public class UserActionItemRequestBuilder {
      */
     public Request build() {
         RequestBuilder builder = new RequestBuilder("POST");
-        builder.addQueryParameter("appkey", this.appkey);
-        builder.addQueryParameter("uid", this.uid);
-        builder.addQueryParameter("iid", this.iid);
+        builder.addQueryParameter("pio_appkey", this.appkey);
+        builder.addQueryParameter("pio_uid", this.uid);
+        builder.addQueryParameter("pio_iid", this.iid);
         if (this.latitude != null && this.longitude != null) {
-            builder.addQueryParameter("latlng", this.latitude.toString() + "," + this.longitude.toString());
+            builder.addQueryParameter("pio_latlng", this.latitude.toString() + "," + this.longitude.toString());
         }
         if (this.t != null) {
-            builder.addQueryParameter("t", t.toString());
+            builder.addQueryParameter("pio_t", t.toString());
         }
 
-        String actionUrl = "";
-        switch (this.action) {
-            case RATE:
-                actionUrl = "/actions/u2i/rate.";
-                builder.addQueryParameter("rate", Integer.toString(this.rate));
-                break;
-            case LIKE:
-                actionUrl = "/actions/u2i/like.";
-                break;
-            case DISLIKE:
-                actionUrl = "/actions/u2i/dislike.";
-                break;
-            case VIEW:
-                actionUrl = "/actions/u2i/view.";
-                break;
-            case VIEWDETAILS:
-                actionUrl = "/actions/u2i/viewDetails.";
-                break;
-            case CONVERSION:
-                actionUrl = "/actions/u2i/conversion.";
-                break;
+        String actionUrl = "/actions/u2i.";
+        builder.addQueryParameter("pio_action", this.action);
+        if (this.action == RATE) {
+            builder.addQueryParameter("pio_rate", Integer.toString(this.rate));
         }
+
         builder.setUrl(this.apiUrl + actionUrl + this.apiFormat);
         return builder.build();
     }

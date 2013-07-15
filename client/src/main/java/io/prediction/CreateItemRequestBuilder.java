@@ -31,9 +31,6 @@ public class CreateItemRequestBuilder {
     private DateTime endT;
     private Map<String, String> attributes;
 
-    private static final String[] SYSTEM_ATTRIBUTES_VALUES = new String[] {"appkey", "iid", "itypes", "latlng", "startT", "endT"};
-    private static final Set<String> SYSTEM_ATTRIBUTES = new HashSet<String>(Arrays.asList(SYSTEM_ATTRIBUTES_VALUES));
-
     /**
      * Instantiate a request builder with mandatory arguments.
      * <p>
@@ -119,7 +116,7 @@ public class CreateItemRequestBuilder {
      * @param value value of the custom item attribute
      */
     public CreateItemRequestBuilder attribute(String name, String value) {
-        if (!SYSTEM_ATTRIBUTES.contains(name)) {
+        if (!name.startsWith("pio_")) {
             this.attributes.put(name, value);
         }
         return this;
@@ -136,17 +133,17 @@ public class CreateItemRequestBuilder {
     public Request build() {
         RequestBuilder builder = new RequestBuilder("POST");
         builder.setUrl(this.apiUrl + "/items." + this.apiFormat);
-        builder.addQueryParameter("appkey", this.appkey);
-        builder.addQueryParameter("iid", this.iid);
-        builder.addQueryParameter("itypes", Utils.arrayToString(this.itypes));
+        builder.addQueryParameter("pio_appkey", this.appkey);
+        builder.addQueryParameter("pio_iid", this.iid);
+        builder.addQueryParameter("pio_itypes", Utils.arrayToString(this.itypes));
         if (this.latitude != null && this.longitude != null) {
-            builder.addQueryParameter("latlng", this.latitude.toString() + "," + this.longitude.toString());
+            builder.addQueryParameter("pio_latlng", this.latitude.toString() + "," + this.longitude.toString());
         }
         if (this.startT != null) {
-            builder.addQueryParameter("startT", startT.toString());
+            builder.addQueryParameter("pio_startT", startT.toString());
         }
         if (this.endT != null) {
-            builder.addQueryParameter("endT", endT.toString());
+            builder.addQueryParameter("pio_endT", endT.toString());
         }
         for (Map.Entry<String, String> attribute : this.attributes.entrySet()) {
             if (attribute.getValue() != null) {

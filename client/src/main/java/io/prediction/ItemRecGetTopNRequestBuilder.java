@@ -131,23 +131,23 @@ public class ItemRecGetTopNRequestBuilder {
     public Request build() {
         RequestBuilder builder = new RequestBuilder("GET");
         builder.setUrl(this.apiUrl + "/engines/itemrec/" + this.engine + "/topn." + this.apiFormat);
-        builder.addQueryParameter("appkey", this.appkey);
-        builder.addQueryParameter("uid", this.uid);
-        builder.addQueryParameter("n", Integer.toString(this.n));
+        builder.addQueryParameter("pio_appkey", this.appkey);
+        builder.addQueryParameter("pio_uid", this.uid);
+        builder.addQueryParameter("pio_n", Integer.toString(this.n));
         if (this.itypes != null && this.itypes.length > 0) {
-            builder.addQueryParameter("itypes", Utils.arrayToString(this.itypes));
+            builder.addQueryParameter("pio_itypes", Utils.arrayToString(this.itypes));
         }
         if (this.latitude != null && this.longitude != null) {
-            builder.addQueryParameter("latlng", this.latitude.toString() + "," + this.longitude.toString());
+            builder.addQueryParameter("pio_latlng", this.latitude.toString() + "," + this.longitude.toString());
         }
         if (this.within != null) {
-            builder.addQueryParameter("within", this.within.toString());
+            builder.addQueryParameter("pio_within", this.within.toString());
         }
         if (this.unit != null) {
-            builder.addQueryParameter("unit", this.unit.toString());
+            builder.addQueryParameter("pio_unit", this.unit.toString());
         }
         if (this.attributes != null && this.attributes.length > 0) {
-            builder.addQueryParameter("attributes", Utils.arrayToString(this.attributes));
+            builder.addQueryParameter("pio_attributes", Utils.arrayToString(this.attributes));
         }
         return builder.build();
     }

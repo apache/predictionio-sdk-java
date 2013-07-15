@@ -91,7 +91,6 @@ public class SampleClient {
             System.out.println("       uid: " + user.getUid());
             System.out.println("       lat: " + user.getLatitude());
             System.out.println("       lng: " + user.getLongitude());
-            System.out.println("   created: " + user.getCreated());
         } catch (Exception e) {
             System.out.println("  FAILED! ("+e.getMessage()+")");
         }
@@ -135,7 +134,6 @@ public class SampleClient {
             System.out.println("      endT: " + item.getEndT());
             System.out.println("       lat: " + item.getLatitude());
             System.out.println("       lng: " + item.getLongitude());
-            System.out.println("   created: " + item.getCreated());
             client.deleteItem("barbaz");
         } catch (Exception e) {
             System.out.println("  FAILED! ("+e.getMessage()+")");

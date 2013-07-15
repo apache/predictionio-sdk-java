@@ -76,10 +76,10 @@ public class CreateUserRequestBuilder {
     public Request build() {
         RequestBuilder builder = new RequestBuilder("POST");
         builder.setUrl(this.apiUrl + "/users." + this.apiFormat);
-        builder.addQueryParameter("appkey", this.appkey);
-        builder.addQueryParameter("uid", this.uid);
+        builder.addQueryParameter("pio_appkey", this.appkey);
+        builder.addQueryParameter("pio_uid", this.uid);
         if (this.latitude != null && this.longitude != null) {
-            builder.addQueryParameter("latlng", this.latitude.toString() + "," + this.longitude.toString());
+            builder.addQueryParameter("pio_latlng", this.latitude.toString() + "," + this.longitude.toString());
         }
         return builder.build();
     }
