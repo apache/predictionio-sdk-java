@@ -39,6 +39,17 @@ public class SampleClient {
             System.out.println("Unable to get status: "+e.getMessage());
         }
 
+        // try get recommendation without identify (For testing purpose)
+        System.out.print("10 recommendations without identifying user:");
+        try {
+            for (String iid : client.getItemRecTopN(engine, 10)) {
+                System.out.print(" " + iid);
+            }
+        } catch (Exception e) {
+            System.out.println("Unable to get recommendations: "+e.getMessage());
+        }
+        System.out.println();
+
         // Try recommendations
         System.out.print("10 recommendations for User ID 1:");
         try {
