@@ -14,7 +14,7 @@ If you have a Maven project, simply add the dependency to your `pom.xml`.
             <dependency>
                 <groupId>io.prediction</groupId>
                 <artifactId>client</artifactId>
-                <version>0.4</version>
+                <version>0.5.0</version>
             </dependency>
         </dependencies>
         ...
@@ -26,7 +26,7 @@ If you use Ivy, simply add the dependency to your `ivy.xml`.
     <ivy-module ...>
         ...
         <dependencies>
-            <dependency org="io.prediction" name="client" rev="0.4" />
+            <dependency org="io.prediction" name="client" rev="0.5.0" />
             ...
         </dependencies>
         ...
@@ -35,7 +35,7 @@ If you use Ivy, simply add the dependency to your `ivy.xml`.
 
 If you have an sbt project, add the library dependency to your build definition.
 
-    libraryDependencies += "io.prediction" % "client" % "0.4"
+    libraryDependencies += "io.prediction" % "client" % "0.5.0"
 
 ### Building from Source
 
