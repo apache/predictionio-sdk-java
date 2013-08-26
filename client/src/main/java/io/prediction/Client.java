@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutionException;
  * Multiple simultaneous asynchronous requests is made possible by the high performance backend provided by the <a href="https://github.com/AsyncHttpClient/async-http-client">Async Http Client</a>.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.4.1
+ * @version 0.5.1-SNAPSHOT
  * @since 0.1
  */
 public class Client {
@@ -538,12 +538,14 @@ public class Client {
     }
 
     /**
-     * Deprecated. Get a get top-n recommendations request builder that can be used to add additional request parameters.
+     * Get a get top-n recommendations request builder that can be used to add additional request parameters.
+     * @deprecated Use {@link Client#getItemRecGetTopNRequestBuilder(String engine, int n)} instead.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
-     * @param n number of top recommendations to get
+     * @param n number of top recommendations to get 
      */
+    @Deprecated
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, String uid, int n) {
         return new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n);
     }
@@ -565,13 +567,15 @@ public class Client {
     }
 
     /**
-     * Deprecated. Get a get top-n recommendations request builder that can be used to add additional request parameters.
+     * Get a get top-n recommendations request builder that can be used to add additional request parameters.
+     * @deprecated Use {@link Client#getItemRecGetTopNRequestBuilder(String engine, int n, String[] attributes)} instead.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
      * @param n number of top recommendations to get
      * @param attributes array of item attribute names to be returned with the result
      */
+    @Deprecated
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, String uid, int n, String[] attributes) {
         return (new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n)).attributes(attributes);
     }
@@ -603,7 +607,8 @@ public class Client {
     }
 
     /**
-     * Deprecated. Sends a synchronous get recommendations request to the API.
+     * Sends a synchronous get recommendations request to the API.
+     * @deprecated Use {@link Client#getItemRecTopN(String engine, int n)} instead.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
@@ -613,6 +618,7 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public String[] getItemRecTopN(String engine, String uid, int n) throws ExecutionException, InterruptedException, IOException {
         return this.getItemRecTopN(this.getItemRecTopNAsFuture(this.getItemRecGetTopNRequestBuilder(engine, uid, n)));
     }
@@ -670,7 +676,8 @@ public class Client {
     }
 
     /**
-     * Deprecated. Sends a synchronous get recommendations request to the API.
+     * Sends a synchronous get recommendations request to the API.
+     * @deprecated Use {@link Client#getItemRecTopNWithAttributes(String engine, int n, String[] attributes)} instead.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
@@ -679,8 +686,9 @@ public class Client {
      *
      * @throws ExecutionException indicates an error in the HTTP backend
      * @throws InterruptedException indicates an interruption during the HTTP operation
-     * @throws IOException indicates an error from the API response
+     * @throws IOException indicates an error from the API response 
      */
+    @Deprecated
     public Map<String, String[]> getItemRecTopNWithAttributes(String engine, String uid, int n, String[] attributes) throws ExecutionException, InterruptedException, IOException {
         return this.getItemRecTopNWithAttributes(this.getItemRecTopNAsFuture(this.getItemRecGetTopNRequestBuilder(engine, uid, n, attributes)));
     }
@@ -828,12 +836,14 @@ public class Client {
     }
 
     /**
-     * Deprecated. Get a user-rate-item action request builder that can be used to add additional request parameters.
+     * Get a user-rate-item action request builder that can be used to add additional request parameters.
+     * @deprecated Use {@link Client#getUserActionItemRequestBuilder(String action, String iid)} instead.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
      * @param rate the rating of this action
      */
+    @Deprecated
     public UserActionItemRequestBuilder getUserRateItemRequestBuilder(String uid, String iid, int rate) {
         UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, UserActionItemRequestBuilder.RATE, uid, iid);
         builder.rate(rate);
@@ -841,16 +851,19 @@ public class Client {
     }
 
     /**
-     * Deprecated. Sends an asynchronous user-rate-item action request to the API.
+     * Sends an asynchronous user-rate-item action request to the API.
+     * @deprecated Use {@link Client#userActionItemAsFuture(UserActionItemRequestBuilder builder)} instead.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
+    @Deprecated
     public FutureAPIResponse userRateItemAsFuture(UserActionItemRequestBuilder builder) throws IOException {
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
 
     /**
-     * Deprecated. Sends a synchronous user-rate-item action request to the API.
+     * Sends a synchronous user-rate-item action request to the API.
+     * @deprecated Use {@link Client#userActionItem(String action, String iid)} instead.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -860,12 +873,14 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userRateItem(String uid, String iid, int rate) throws ExecutionException, InterruptedException, IOException {
         this.userRateItem(this.userRateItemAsFuture(this.getUserRateItemRequestBuilder(uid, iid, rate)));
     }
 
     /**
-     * Deprecated. Sends a synchronous user-rate-item action request to the API.
+     * Sends a synchronous user-rate-item action request to the API.
+     * @deprecated Use {@link Client#userActionItem(UserActionItemRequestBuilder builder)} instead.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      *
@@ -873,12 +888,14 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userRateItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.userRateItem(this.userRateItemAsFuture(builder));
     }
 
     /**
-     * Deprecated. Synchronize a previously sent asynchronous user-rate-item action request.
+     * Synchronize a previously sent asynchronous user-rate-item action request.
+     * @deprecated Use {@link Client#userActionItem(FutureAPIResponse response)} instead.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userRateItemAsFuture}
      *
@@ -886,31 +903,37 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userRateItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         this.userActionItem(response);
     }
 
     /**
-     * Deprecated. Get a user-like-item action request builder that can be used to add additional request parameters.
+     * Get a user-like-item action request builder that can be used to add additional request parameters.
+     * @deprecated Use {@link Client#getUserActionItemRequestBuilder(String action, String iid)} instead.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
      */
+    @Deprecated
     public UserActionItemRequestBuilder getUserLikeItemRequestBuilder(String uid, String iid) {
         return new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, UserActionItemRequestBuilder.LIKE, uid, iid);
     }
 
     /**
-     * Deprecated. Sends an asynchronous user-like-item action request to the API.
+     * Sends an asynchronous user-like-item action request to the API.
+     * @deprecated Use {@link Client#userActionItemAsFuture(UserActionItemRequestBuilder builder)} instead.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
+    @Deprecated
     public FutureAPIResponse userLikeItemAsFuture(UserActionItemRequestBuilder builder) throws IOException {
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
 
     /**
-     * Deprecated. Sends a synchronous user-like-item action request to the API.
+     * Sends a synchronous user-like-item action request to the API.
+     * @deprecated Use {@link Client#userActionItem(String action, String iid)} instead.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -919,12 +942,14 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userLikeItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
         this.userLikeItem(this.userLikeItemAsFuture(this.getUserLikeItemRequestBuilder(uid, iid)));
     }
 
     /**
-     * Deprecated. Sends a synchronous user-like-item action request to the API.
+     * Sends a synchronous user-like-item action request to the API.
+     * @deprecated Use {@link Client#userActionItem(UserActionItemRequestBuilder builder)} instead.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      *
@@ -932,12 +957,14 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userLikeItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.userLikeItem(this.userLikeItemAsFuture(builder));
     }
 
     /**
-     * Deprecated. Synchronize a previously sent asynchronous user-like-item action request.
+     * Synchronize a previously sent asynchronous user-like-item action request.
+     * @deprecated Use {@link Client#userActionItem(FutureAPIResponse response)} instead.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userLikeItemAsFuture}
      *
@@ -945,31 +972,38 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userLikeItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         this.userActionItem(response);
     }
 
     /**
-     * Deprecated. Get a user-dislike-item action request builder that can be used to add additional request parameters.
+     * Get a user-dislike-item action request builder that can be used to add additional request parameters.
+     * @deprecated Use {@link Client#getUserActionItemRequestBuilder(String action, String iid)} instead.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
+     * 
      */
+    @Deprecated
     public UserActionItemRequestBuilder getUserDislikeItemRequestBuilder(String uid, String iid) {
         return new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, UserActionItemRequestBuilder.DISLIKE, uid, iid);
     }
 
     /**
-     * Deprecated. Sends an asynchronous user-dislike-item action request to the API.
+     * Sends an asynchronous user-dislike-item action request to the API.
+     * @deprecated Use {@link Client#userActionItemAsFuture(UserActionItemRequestBuilder builder)} instead.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
+    @Deprecated
     public FutureAPIResponse userDislikeItemAsFuture(UserActionItemRequestBuilder builder) throws IOException {
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
 
     /**
-     * Deprecated. Sends a synchronous user-dislike-item action request to the API.
+     * Sends a synchronous user-dislike-item action request to the API.
+     * @deprecated Use {@link Client#userActionItem(String action, String iid)} instead.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -978,12 +1012,14 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userDislikeItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
         this.userDislikeItem(this.userDislikeItemAsFuture(this.getUserDislikeItemRequestBuilder(uid, iid)));
     }
 
     /**
-     * Deprecated. Sends a synchronous user-dislike-item action request to the API.
+     * Sends a synchronous user-dislike-item action request to the API.
+     * @deprecated Use {@link Client#userActionItem(UserActionItemRequestBuilder builder)} instead.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      *
@@ -991,12 +1027,14 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userDislikeItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.userDislikeItem(this.userDislikeItemAsFuture(builder));
     }
 
     /**
-     * Deprecated. Synchronize a previously sent asynchronous user-dislike-item action request.
+     * Synchronize a previously sent asynchronous user-dislike-item action request.
+     * @deprecated Use {@link Client#userActionItem(FutureAPIResponse response)} instead.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userDislikeItemAsFuture}
      *
@@ -1004,31 +1042,37 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userDislikeItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         this.userActionItem(response);
     }
 
     /**
-     * Deprecated. Get a user-view-item action request builder that can be used to add additional request parameters.
+     * Get a user-view-item action request builder that can be used to add additional request parameters.
+     * @deprecated Use {@link Client#getUserActionItemRequestBuilder(String action, String iid)} instead.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
      */
+    @Deprecated
     public UserActionItemRequestBuilder getUserViewItemRequestBuilder(String uid, String iid) {
         return new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, UserActionItemRequestBuilder.VIEW, uid, iid);
     }
 
     /**
-     * Deprecated. Sends an asynchronous user-view-item action request to the API.
+     * Sends an asynchronous user-view-item action request to the API.
+     * @deprecated Use {@link Client#userActionItemAsFuture(UserActionItemRequestBuilder builder)} instead.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
+    @Deprecated
     public FutureAPIResponse userViewItemAsFuture(UserActionItemRequestBuilder builder) throws IOException {
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
 
     /**
-     * Deprecated. Sends a synchronous user-view-item action request to the API.
+     * Sends a synchronous user-view-item action request to the API.
+     * @deprecated Use {@link Client#userActionItem(String action, String iid)} instead.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -1037,12 +1081,14 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userViewItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
         this.userViewItem(this.userViewItemAsFuture(this.getUserViewItemRequestBuilder(uid, iid)));
     }
 
     /**
-     * Deprecated. Sends a synchronous user-view-item action request to the API.
+     * Sends a synchronous user-view-item action request to the API.
+     * @deprecated Use {@link Client#userActionItem(UserActionItemRequestBuilder builder)} instead.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      *
@@ -1050,12 +1096,14 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userViewItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.userViewItem(this.userViewItemAsFuture(builder));
     }
 
     /**
-     * Deprecated. Synchronize a previously sent asynchronous user-view-item action request.
+     * Synchronize a previously sent asynchronous user-view-item action request.
+     * @deprecated Use {@link Client#userActionItem(FutureAPIResponse response)} instead.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userViewItemAsFuture}
      *
@@ -1063,31 +1111,37 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userViewItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         this.userActionItem(response);
     }
 
     /**
-     * Deprecated. Get a user-conversion-item action request builder that can be used to add additional request parameters.
+     * Get a user-conversion-item action request builder that can be used to add additional request parameters.
+     * @deprecated Use {@link Client#getUserActionItemRequestBuilder(String action, String iid)} instead.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
      */
+    @Deprecated
     public UserActionItemRequestBuilder getUserConversionItemRequestBuilder(String uid, String iid) {
         return new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, UserActionItemRequestBuilder.CONVERSION, uid, iid);
     }
 
     /**
-     * Deprecated. Sends an asynchronous user-conversion-item action request to the API.
+     * Sends an asynchronous user-conversion-item action request to the API.
+     * @deprecated Use {@link Client#userActionItemAsFuture(UserActionItemRequestBuilder builder)} instead.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      */
+    @Deprecated
     public FutureAPIResponse userConversionItemAsFuture(UserActionItemRequestBuilder builder) throws IOException {
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
 
     /**
-     * Deprecated. Sends a synchronous user-conversion-item action request to the API.
+     * Sends a synchronous user-conversion-item action request to the API.
+     * @deprecated Use {@link Client#userActionItem(String action, String iid)} instead.
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
@@ -1096,12 +1150,14 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userConversionItem(String uid, String iid) throws ExecutionException, InterruptedException, IOException {
         this.userConversionItem(this.userConversionItemAsFuture(this.getUserConversionItemRequestBuilder(uid, iid)));
     }
 
     /**
-     * Deprecated. Sends a synchronous user-conversion-item action request to the API.
+     * Sends a synchronous user-conversion-item action request to the API.
+     * @deprecated Use {@link Client#userActionItem(UserActionItemRequestBuilder builder)} instead.
      *
      * @param builder an instance of {@link UserActionItemRequestBuilder} that will be turned into a request
      *
@@ -1109,12 +1165,14 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userConversionItem(UserActionItemRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
         this.userConversionItem(this.userConversionItemAsFuture(builder));
     }
 
     /**
-     * Deprecated. Synchronize a previously sent asynchronous user-conversion-item action request.
+     * Synchronize a previously sent asynchronous user-conversion-item action request.
+     * @deprecated Use {@link Client#userActionItem(FutureAPIResponse response)} instead.
      *
      * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userConversionItemAsFuture}
      *
@@ -1122,6 +1180,7 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
+    @Deprecated
     public void userConversionItem(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
         this.userActionItem(response);
     }
