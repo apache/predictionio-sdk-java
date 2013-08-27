@@ -750,6 +750,144 @@ public class Client {
     }
 
     /**
+     * Get a get top-n similar items request builder that can be used to add additional request parameters.
+     *
+     * @param engine engine name
+     * @param iid ID of the Item
+     * @param n number of top similar items to get 
+     */
+    public ItemSimGetTopNRequestBuilder getItemSimGetTopNRequestBuilder(String engine, String iid, int n) {
+        return new ItemSimGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, iid, n);
+    }
+
+    /**
+     * Get a get top-n similar items request builder that can be used to add additional request parameters.
+     *
+     * @param engine engine name
+     * @param iid ID of the Item
+     * @param n number of top similar items to get
+     * @param attributes array of item attribute names to be returned with the result
+     */
+    public ItemSimGetTopNRequestBuilder getItemSimGetTopNRequestBuilder(String engine, String iid, int n, String[] attributes) {
+        return new ItemSimGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, iid, n).attributes(attributes);
+    }
+
+    /**
+     * Sends an asynchronous get similar items request to the API.
+     *
+     * @param builder an instance of {@link ItemSimGetTopNRequestBuilder} that will be turned into a request
+     */
+    public FutureAPIResponse getItemSimTopNAsFuture(ItemSimGetTopNRequestBuilder builder) throws IOException {
+        return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
+    }
+
+    /**
+     * Sends a synchronous get similar items request to the API.
+     *
+     * @param engine engine name
+     * @param iid ID of the Item
+     * @param n number of top recommendations to get
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemSimTopN(String engine, String iid, int n) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemSimTopN(this.getItemSimTopNAsFuture(this.getItemSimGetTopNRequestBuilder(engine, iid, n)));
+    }
+
+    /**
+     * Sends a synchronous get similar items request to the API.
+     *
+     * @param builder an instance of {@link ItemSimGetTopNRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemSimTopN(ItemSimGetTopNRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemSimTopN(this.getItemSimTopNAsFuture(builder));
+    }
+
+    /**
+     * Synchronize a previously sent asynchronous get similar items request.
+     *
+     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getItemSimTopNAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemSimTopN(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        // Do not use getStatus/getMessage directly as they do not pass exceptions
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
+
+        if (status == Client.HTTP_OK) {
+            JsonObject messageAsJson = (JsonObject) parser.parse(message);
+            JsonArray iidsAsJson = messageAsJson.getAsJsonArray("pio_iids");
+            return this.jsonArrayAsStringArray(iidsAsJson);
+        } else {
+            throw new IOException(message);
+        }
+    }
+
+    /**
+     * Sends a synchronous get similar items request to the API.
+     * 
+     * @param engine engine name
+     * @param iid ID of the Item
+     * @param n number of top recommendations to get
+     * @param attributes array of item attribute names to be returned with the result
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response 
+     */
+    public Map<String, String[]> getItemSimTopNWithAttributes(String engine, String iid, int n, String[] attributes) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemSimTopNWithAttributes(this.getItemSimTopNAsFuture(this.getItemSimGetTopNRequestBuilder(engine, iid, n, attributes)));
+    }
+
+    /**
+     * Sends a synchronous get similar items request to the API.
+     *
+     * @param builder an instance of {@link ItemSimGetTopNRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemSimTopNWithAttributes(ItemSimGetTopNRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemSimTopNWithAttributes(this.getItemSimTopNAsFuture(builder));
+    }
+
+    /**
+     * Synchronize a previously sent asynchronous get similar items request.
+     *
+     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getItemSimTopNAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemSimTopNWithAttributes(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        // Do not use getStatus/getMessage directly as they do not pass exceptions
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
+
+        if (status == Client.HTTP_OK) {
+            HashMap<String, String[]> results = new HashMap();
+            JsonObject messageAsJson = (JsonObject) parser.parse(message);
+            for (Map.Entry<String, JsonElement> member : messageAsJson.entrySet()) {
+                results.put(member.getKey(), this.jsonArrayAsStringArray(member.getValue().getAsJsonArray()));
+            }
+            return results;
+        } else {
+            throw new IOException(message);
+        }
+    }
+
+    /**
      * Get a user-action-on-item request builder that can be used to add additional request parameters.
      * Identified user ID will be used. See {@link Client#identify}.
      *
