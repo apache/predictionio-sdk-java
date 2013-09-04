@@ -7,8 +7,8 @@ import com.ning.http.client.RequestBuilder;
  * Get top n similar items request builder for item similarity engine
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.5.1-SNAPSHOT
- * @since 0.5.1-SNAPSHOT
+ * @version 0.6.0
+ * @since 0.6.0
  */
 
 public class ItemSimGetTopNRequestBuilder {

@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutionException;
  * Multiple simultaneous asynchronous requests is made possible by the high performance backend provided by the <a href="https://github.com/AsyncHttpClient/async-http-client">Async Http Client</a>.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.5.1-SNAPSHOT
+ * @version 0.6.0
  * @since 0.1
  */
 public class Client {
