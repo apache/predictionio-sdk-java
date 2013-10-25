@@ -66,7 +66,7 @@ If you have not already cloned the repository from the section above, do
 
 ### Running the Sample Android Client
 
-Detailed instructions can be found at our [main documentation site](http://docs.prediction.io/tutorials/android-client.html).
+Detailed instructions can be found at our [main documentation site](http://docs.prediction.io/current/tutorials/android-client.html).
 
 ### Running CLI Examples
 
