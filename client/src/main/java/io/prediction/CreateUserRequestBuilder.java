@@ -1,14 +1,14 @@
 package io.prediction;
 
+import com.google.gson.JsonObject;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-
 
 /**
  * Class to build User requests
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.3
+ * @version 0.6.1
  * @since 0.2
  */
 
@@ -76,11 +76,21 @@ public class CreateUserRequestBuilder {
     public Request build() {
         RequestBuilder builder = new RequestBuilder("POST");
         builder.setUrl(this.apiUrl + "/users." + this.apiFormat);
-        builder.addQueryParameter("pio_appkey", this.appkey);
-        builder.addQueryParameter("pio_uid", this.uid);
+
+        JsonObject requestJson = new JsonObject();
+
+        requestJson.addProperty("pio_appkey", this.appkey);
+        requestJson.addProperty("pio_uid", this.uid);
         if (this.latitude != null && this.longitude != null) {
-            builder.addQueryParameter("pio_latlng", this.latitude.toString() + "," + this.longitude.toString());
+            requestJson.addProperty("pio_latlng", this.latitude.toString() + "," + this.longitude.toString());
         }
+
+        String requestJsonString = requestJson.toString();
+
+        builder.setBody(requestJsonString);
+        builder.setHeader("Content-Type","application/json");
+        builder.setHeader("Content-Length", ""+requestJsonString.length());
+
         return builder.build();
     }
 }

@@ -14,7 +14,7 @@ If you have a Maven project, simply add the dependency to your `pom.xml`.
             <dependency>
                 <groupId>io.prediction</groupId>
                 <artifactId>client</artifactId>
-                <version>0.6.0</version>
+                <version>0.6.1</version>
             </dependency>
         </dependencies>
         ...
@@ -26,7 +26,7 @@ If you use Ivy, simply add the dependency to your `ivy.xml`.
     <ivy-module ...>
         ...
         <dependencies>
-            <dependency org="io.prediction" name="client" rev="0.6.0" />
+            <dependency org="io.prediction" name="client" rev="0.6.1" />
             ...
         </dependencies>
         ...
@@ -35,7 +35,7 @@ If you use Ivy, simply add the dependency to your `ivy.xml`.
 
 If you have an sbt project, add the library dependency to your build definition.
 
-    libraryDependencies += "io.prediction" % "client" % "0.6.0"
+    libraryDependencies += "io.prediction" % "client" % "0.6.1"
 
 ### Building from Source
 
@@ -66,7 +66,7 @@ If you have not already cloned the repository from the section above, do
 
 ### Running the Sample Android Client
 
-Detailed instructions can be found at our [main documentation site](http://docs.prediction.io/tutorials/android-client.html).
+Detailed instructions can be found at our [main documentation site](http://docs.prediction.io/current/tutorials/android-client.html).
 
 ### Running CLI Examples
 

@@ -1,8 +1,9 @@
 package io.prediction;
 
+import com.google.gson.JsonObject;
+import org.joda.time.DateTime;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-import org.joda.time.DateTime;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.Set;
  * Class to build Item requests
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.4.2
+ * @version 0.6.1
  * @since 0.2
  */
 
@@ -133,23 +134,33 @@ public class CreateItemRequestBuilder {
     public Request build() {
         RequestBuilder builder = new RequestBuilder("POST");
         builder.setUrl(this.apiUrl + "/items." + this.apiFormat);
-        builder.addQueryParameter("pio_appkey", this.appkey);
-        builder.addQueryParameter("pio_iid", this.iid);
-        builder.addQueryParameter("pio_itypes", Utils.arrayToString(this.itypes));
+
+        JsonObject requestJson = new JsonObject();
+
+        requestJson.addProperty("pio_appkey", this.appkey);
+        requestJson.addProperty("pio_iid", this.iid);
+        requestJson.addProperty("pio_itypes", Utils.arrayToString(this.itypes));
         if (this.latitude != null && this.longitude != null) {
-            builder.addQueryParameter("pio_latlng", this.latitude.toString() + "," + this.longitude.toString());
+            requestJson.addProperty("pio_latlng", this.latitude.toString() + "," + this.longitude.toString());
         }
         if (this.startT != null) {
-            builder.addQueryParameter("pio_startT", startT.toString());
+            requestJson.addProperty("pio_startT", startT.toString());
         }
         if (this.endT != null) {
-            builder.addQueryParameter("pio_endT", endT.toString());
+            requestJson.addProperty("pio_endT", endT.toString());
         }
         for (Map.Entry<String, String> attribute : this.attributes.entrySet()) {
             if (attribute.getValue() != null) {
-                builder.addQueryParameter(attribute.getKey(), attribute.getValue());
+                requestJson.addProperty(attribute.getKey(), attribute.getValue());
             }
         }
+
+        String requestJsonString = requestJson.toString();
+
+        builder.setBody(requestJsonString);
+        builder.setHeader("Content-Type","application/json");
+        builder.setHeader("Content-Length", ""+requestJsonString.length());
+
         return builder.build();
     }
 }
