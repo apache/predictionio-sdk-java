@@ -1,14 +1,15 @@
 package io.prediction;
 
+import com.google.gson.JsonObject;
+import org.joda.time.DateTime;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-import org.joda.time.DateTime;
 
 /**
  * UserActionItem request builder
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.2
+ * @version 0.6.1
  * @since 0.2
  */
 
@@ -138,23 +139,33 @@ public class UserActionItemRequestBuilder {
      */
     public Request build() {
         RequestBuilder builder = new RequestBuilder("POST");
-        builder.addQueryParameter("pio_appkey", this.appkey);
-        builder.addQueryParameter("pio_uid", this.uid);
-        builder.addQueryParameter("pio_iid", this.iid);
+
+        JsonObject requestJson = new JsonObject();
+
+        requestJson.addProperty("pio_appkey", this.appkey);
+        requestJson.addProperty("pio_uid", this.uid);
+        requestJson.addProperty("pio_iid", this.iid);
         if (this.latitude != null && this.longitude != null) {
-            builder.addQueryParameter("pio_latlng", this.latitude.toString() + "," + this.longitude.toString());
+            requestJson.addProperty("pio_latlng", this.latitude.toString() + "," + this.longitude.toString());
         }
         if (this.t != null) {
-            builder.addQueryParameter("pio_t", t.toString());
+            requestJson.addProperty("pio_t", t.toString());
         }
 
         String actionUrl = "/actions/u2i.";
-        builder.addQueryParameter("pio_action", this.action);
+        requestJson.addProperty("pio_action", this.action);
         if (this.action == RATE) {
-            builder.addQueryParameter("pio_rate", Integer.toString(this.rate));
+            requestJson.addProperty("pio_rate", Integer.toString(this.rate));
         }
 
         builder.setUrl(this.apiUrl + actionUrl + this.apiFormat);
+
+        String requestJsonString = requestJson.toString();
+
+        builder.setBody(requestJsonString);
+        builder.setHeader("Content-Type","application/json");
+        builder.setHeader("Content-Length", ""+requestJsonString.length());
+
         return builder.build();
     }
 }

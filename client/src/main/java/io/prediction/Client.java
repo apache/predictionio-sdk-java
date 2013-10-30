@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutionException;
  * Multiple simultaneous asynchronous requests is made possible by the high performance backend provided by the <a href="https://github.com/AsyncHttpClient/async-http-client">Async Http Client</a>.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.6.0
+ * @version 0.6.1
  * @since 0.1
  */
 public class Client {
@@ -539,13 +539,13 @@ public class Client {
 
     /**
      * Get a get top-n recommendations request builder that can be used to add additional request parameters.
-     * @deprecated Use {@link Client#getItemRecGetTopNRequestBuilder(String engine, int n)} instead.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
-     * @param n number of top recommendations to get 
+     * @param n number of top recommendations to get
      */
-    @Deprecated
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, String uid, int n) {
         return new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n);
     }
@@ -568,14 +568,14 @@ public class Client {
 
     /**
      * Get a get top-n recommendations request builder that can be used to add additional request parameters.
-     * @deprecated Use {@link Client#getItemRecGetTopNRequestBuilder(String engine, int n, String[] attributes)} instead.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
      * @param n number of top recommendations to get
      * @param attributes array of item attribute names to be returned with the result
      */
-    @Deprecated
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, String uid, int n, String[] attributes) {
         return (new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n)).attributes(attributes);
     }
@@ -608,7 +608,8 @@ public class Client {
 
     /**
      * Sends a synchronous get recommendations request to the API.
-     * @deprecated Use {@link Client#getItemRecTopN(String engine, int n)} instead.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
@@ -618,7 +619,6 @@ public class Client {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
-    @Deprecated
     public String[] getItemRecTopN(String engine, String uid, int n) throws ExecutionException, InterruptedException, IOException {
         return this.getItemRecTopN(this.getItemRecTopNAsFuture(this.getItemRecGetTopNRequestBuilder(engine, uid, n)));
     }
@@ -677,7 +677,8 @@ public class Client {
 
     /**
      * Sends a synchronous get recommendations request to the API.
-     * @deprecated Use {@link Client#getItemRecTopNWithAttributes(String engine, int n, String[] attributes)} instead.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
      *
      * @param engine engine name
      * @param uid ID of the User whose recommendations will be gotten
@@ -686,9 +687,8 @@ public class Client {
      *
      * @throws ExecutionException indicates an error in the HTTP backend
      * @throws InterruptedException indicates an interruption during the HTTP operation
-     * @throws IOException indicates an error from the API response 
+     * @throws IOException indicates an error from the API response
      */
-    @Deprecated
     public Map<String, String[]> getItemRecTopNWithAttributes(String engine, String uid, int n, String[] attributes) throws ExecutionException, InterruptedException, IOException {
         return this.getItemRecTopNWithAttributes(this.getItemRecTopNAsFuture(this.getItemRecGetTopNRequestBuilder(engine, uid, n, attributes)));
     }
@@ -754,7 +754,7 @@ public class Client {
      *
      * @param engine engine name
      * @param iid ID of the Item
-     * @param n number of top similar items to get 
+     * @param n number of top similar items to get
      */
     public ItemSimGetTopNRequestBuilder getItemSimGetTopNRequestBuilder(String engine, String iid, int n) {
         return new ItemSimGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, iid, n);
@@ -834,7 +834,7 @@ public class Client {
 
     /**
      * Sends a synchronous get similar items request to the API.
-     * 
+     *
      * @param engine engine name
      * @param iid ID of the Item
      * @param n number of top recommendations to get
@@ -842,7 +842,7 @@ public class Client {
      *
      * @throws ExecutionException indicates an error in the HTTP backend
      * @throws InterruptedException indicates an interruption during the HTTP operation
-     * @throws IOException indicates an error from the API response 
+     * @throws IOException indicates an error from the API response
      */
     public Map<String, String[]> getItemSimTopNWithAttributes(String engine, String iid, int n, String[] attributes) throws ExecutionException, InterruptedException, IOException {
         return this.getItemSimTopNWithAttributes(this.getItemSimTopNAsFuture(this.getItemSimGetTopNRequestBuilder(engine, iid, n, attributes)));
@@ -889,6 +889,20 @@ public class Client {
 
     /**
      * Get a user-action-on-item request builder that can be used to add additional request parameters.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
+     *
+     * @param uid ID of the User of this action
+     * @param action action name
+     * @param iid ID of the Item of this action
+     */
+    public UserActionItemRequestBuilder getUserActionItemRequestBuilder(String uid, String action, String iid) {
+        UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, action, uid, iid);
+        return builder;
+    }
+
+    /**
+     * Get a user-action-on-item request builder that can be used to add additional request parameters.
      * Identified user ID will be used. See {@link Client#identify}.
      *
      * @param action action name
@@ -902,6 +916,19 @@ public class Client {
         }
         UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, action, this.uid, iid);
         return builder;
+    }
+
+    /**
+     * Sends an asynchronous user-action-on-item request to the API.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
+     *
+     * @param uid ID of the User of this action
+     * @param action action name
+     * @param iid ID of the Item of this action
+     */
+    public FutureAPIResponse userActionItemAsFuture(String uid, String action, String iid) throws IOException {
+        return this.userActionItemAsFuture(this.getUserActionItemRequestBuilder(uid, action, iid));
     }
 
     /**
@@ -924,6 +951,23 @@ public class Client {
      */
     public FutureAPIResponse userActionItemAsFuture(UserActionItemRequestBuilder builder) throws IOException {
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
+    }
+
+    /**
+     * Sends a synchronous user-action-on-item request to the API.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
+     *
+     * @param uid ID of the User of this action
+     * @param action action name
+     * @param iid ID of the Item of this action
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public void userActionItem(String uid, String action, String iid) throws ExecutionException, InterruptedException, IOException {
+        this.userActionItem(this.userActionItemAsFuture(this.getUserActionItemRequestBuilder(uid, action, iid)));
     }
 
     /**
@@ -1121,7 +1165,7 @@ public class Client {
      *
      * @param uid ID of the User of this action
      * @param iid ID of the Item of this action
-     * 
+     *
      */
     @Deprecated
     public UserActionItemRequestBuilder getUserDislikeItemRequestBuilder(String uid, String iid) {
