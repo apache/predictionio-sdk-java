@@ -21,7 +21,7 @@ import java.util.TreeSet;
 public class SampleImport {
     public static void main(String[] args) {
     	/* set appurl to your API server */
-    	String appurl = "http://localhost:8000";
+        String appurl = "http://localhost:8000";
         /* Handle command line arguments */
         String appkey = null;
         String inputFile = null;
@@ -39,7 +39,7 @@ public class SampleImport {
         /* Read input MovieLens data and send requests to API */
         try {
             /* Create a client with an app key */
-        client = new Client(appkey, appurl);
+            client = new Client(appkey, appurl);
 
             /* Data structure */
             Set<String> uids = new TreeSet<String>();
@@ -76,19 +76,19 @@ public class SampleImport {
                 int j;
                 for (j=0; j<5; j++) {
                     FutureAPIResponse r;
- 
+
                     // create all types of actions for testing purpose
                     switch (j) {
-                        case 0: 
+                        case 0:
                             r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("view", iid));
                             break;
-                        case 1: 
+                        case 1:
                             r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("like", iid));
                             break;
-                        case 2: 
+                        case 2:
                             r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("dislike", iid));
                             break;
-                        case 3: 
+                        case 3:
                             r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("conversion", iid));
                             break;
                         default:
