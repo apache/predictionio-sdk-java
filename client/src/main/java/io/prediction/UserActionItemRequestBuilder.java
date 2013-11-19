@@ -154,7 +154,7 @@ public class UserActionItemRequestBuilder {
 
         String actionUrl = "/actions/u2i.";
         requestJson.addProperty("pio_action", this.action);
-        if (this.action == RATE) {
+        if (RATE.equals(this.action)) {
             requestJson.addProperty("pio_rate", Integer.toString(this.rate));
         }
 
