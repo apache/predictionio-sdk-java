@@ -219,7 +219,7 @@ public class Client {
      * @param uid ID of the User to be created
      */
     public CreateUserRequestBuilder getCreateUserRequestBuilder(String uid) {
-        return new CreateUserRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, uid);
+        return new CreateUserRequestBuilder(this.apiUrl, apiFormat, this.appkey, uid);
     }
 
     /**
@@ -281,7 +281,7 @@ public class Client {
      * @param uid ID of the User to get
      */
     public FutureAPIResponse getUserAsFuture(String uid) throws IOException {
-        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/users/" + uid + "." + this.apiFormat).addQueryParameter("pio_appkey", this.appkey).build();
+        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/users/" + uid + "." + apiFormat).addQueryParameter("pio_appkey", this.appkey).build();
         return new FutureAPIResponse(this.client.executeRequest(request, this.getHandler()));
     }
 
@@ -333,7 +333,7 @@ public class Client {
      */
     public FutureAPIResponse deleteUserAsFuture(String uid) throws IOException {
         RequestBuilder builder = new RequestBuilder("DELETE");
-        builder.setUrl(this.apiUrl + "/users/" + uid + "." + this.apiFormat);
+        builder.setUrl(this.apiUrl + "/users/" + uid + "." + apiFormat);
         builder.addQueryParameter("pio_appkey", this.appkey);
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
@@ -376,7 +376,7 @@ public class Client {
      * @param itypes array of types of the Item
      */
     public CreateItemRequestBuilder getCreateItemRequestBuilder(String iid, String[] itypes) {
-        return new CreateItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, iid, itypes);
+        return new CreateItemRequestBuilder(this.apiUrl, apiFormat, this.appkey, iid, itypes);
     }
 
     /**
@@ -439,7 +439,7 @@ public class Client {
      * @param iid ID of the Item to get
      */
     public FutureAPIResponse getItemAsFuture(String iid) throws IOException {
-        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/items/" + iid + "." + this.apiFormat).addQueryParameter("pio_appkey", this.appkey).build();
+        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/items/" + iid + "." + apiFormat).addQueryParameter("pio_appkey", this.appkey).build();
         return new FutureAPIResponse(this.client.executeRequest(request, this.getHandler()));
     }
 
@@ -498,7 +498,7 @@ public class Client {
      */
     public FutureAPIResponse deleteItemAsFuture(String iid) throws IOException {
         RequestBuilder builder = new RequestBuilder("DELETE");
-        builder.setUrl(this.apiUrl + "/items/" + iid + "." + this.apiFormat);
+        builder.setUrl(this.apiUrl + "/items/" + iid + "." + apiFormat);
         builder.addQueryParameter("pio_appkey", this.appkey);
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
@@ -544,7 +544,7 @@ public class Client {
      * @param n number of top recommendations to get
      */
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, String uid, int n) {
-        return new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n);
+        return new ItemRecGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, uid, n);
     }
 
     /**
@@ -560,7 +560,7 @@ public class Client {
         if (this.uid == null) {
             throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
         }
-        return new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, this.uid, n);
+        return new ItemRecGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, this.uid, n);
     }
 
     /**
@@ -574,7 +574,7 @@ public class Client {
      * @param attributes array of item attribute names to be returned with the result
      */
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, String uid, int n, String[] attributes) {
-        return (new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n)).attributes(attributes);
+        return (new ItemRecGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, uid, n)).attributes(attributes);
     }
 
     /**
@@ -591,7 +591,7 @@ public class Client {
         if (this.uid == null) {
             throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
         }
-        return (new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, this.uid, n)).attributes(attributes);
+        return (new ItemRecGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, this.uid, n)).attributes(attributes);
     }
 
     /**
@@ -754,7 +754,7 @@ public class Client {
      * @param n number of top similar items to get
      */
     public ItemSimGetTopNRequestBuilder getItemSimGetTopNRequestBuilder(String engine, String iid, int n) {
-        return new ItemSimGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, iid, n);
+        return new ItemSimGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, iid, n);
     }
 
     /**
@@ -766,7 +766,7 @@ public class Client {
      * @param attributes array of item attribute names to be returned with the result
      */
     public ItemSimGetTopNRequestBuilder getItemSimGetTopNRequestBuilder(String engine, String iid, int n, String[] attributes) {
-        return new ItemSimGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, iid, n).attributes(attributes);
+        return new ItemSimGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, iid, n).attributes(attributes);
     }
 
     /**
@@ -894,7 +894,7 @@ public class Client {
      * @param iid ID of the Item of this action
      */
     public UserActionItemRequestBuilder getUserActionItemRequestBuilder(String uid, String action, String iid) {
-        UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, action, uid, iid);
+        UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, apiFormat, this.appkey, action, uid, iid);
         return builder;
     }
 
@@ -911,7 +911,7 @@ public class Client {
         if (this.uid == null) {
             throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
         }
-        UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, action, this.uid, iid);
+        UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, apiFormat, this.appkey, action, this.uid, iid);
         return builder;
     }
 
