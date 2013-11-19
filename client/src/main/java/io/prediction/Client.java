@@ -737,7 +737,7 @@ public class Client implements Closeable {
         String message = response.get().getMessage();
 
         if (status == Client.HTTP_OK) {
-            HashMap<String, String[]> results = new HashMap();
+            Map<String, String[]> results = new HashMap<String, String[]>();
             JsonObject messageAsJson = (JsonObject) parser.parse(message);
             for (Map.Entry<String, JsonElement> member : messageAsJson.entrySet()) {
                 results.put(member.getKey(), this.jsonArrayAsStringArray(member.getValue().getAsJsonArray()));
@@ -875,7 +875,7 @@ public class Client implements Closeable {
         String message = response.get().getMessage();
 
         if (status == Client.HTTP_OK) {
-            HashMap<String, String[]> results = new HashMap();
+            Map<String, String[]> results = new HashMap<String, String[]>();
             JsonObject messageAsJson = (JsonObject) parser.parse(message);
             for (Map.Entry<String, JsonElement> member : messageAsJson.entrySet()) {
                 results.put(member.getKey(), this.jsonArrayAsStringArray(member.getValue().getAsJsonArray()));
