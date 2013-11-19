@@ -48,7 +48,7 @@ public class Client {
     private JsonParser parser = new JsonParser();
 
     // internal field
-    private String uid = "";
+    private String uid = null;
 
     /**
      * Instantiate a PredictionIO RESTful API client using default values for API URL and thread limit.
@@ -557,7 +557,7 @@ public class Client {
      * @throws UnidentifiedUserException indicates an unidentified user ID error
      */
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, int n) throws UnidentifiedUserException {
-        if (this.uid.equals("")) {
+        if (this.uid == null) {
             throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
         }
         return new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, this.uid, n);
@@ -588,7 +588,7 @@ public class Client {
      * @throws UnidentifiedUserException indicates an unidentified user ID error
      */
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, int n, String[] attributes) throws UnidentifiedUserException {
-        if (this.uid.equals("")) {
+        if (this.uid == null) {
             throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
         }
         return (new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, this.uid, n)).attributes(attributes);
@@ -908,7 +908,7 @@ public class Client {
      * @throws UnidentifiedUserException indicates an unidentified user ID error
      */
     public UserActionItemRequestBuilder getUserActionItemRequestBuilder(String action, String iid) throws UnidentifiedUserException {
-        if (this.uid.equals("")) {
+        if (this.uid == null) {
             throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
         }
         UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, action, this.uid, iid);
