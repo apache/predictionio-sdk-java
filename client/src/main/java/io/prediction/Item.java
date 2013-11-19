@@ -1,7 +1,5 @@
 package io.prediction;
 
-import org.joda.time.DateTime;
-
 import java.util.Date;
 
 /**

@@ -1,16 +1,12 @@
 package io.prediction;
 
 import com.google.gson.JsonObject;
-import org.joda.time.DateTime;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import org.joda.time.DateTime;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * Class to build Item requests
