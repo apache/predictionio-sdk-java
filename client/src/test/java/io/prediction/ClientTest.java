@@ -1,21 +1,23 @@
 package io.prediction;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsArray.array;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsArray.array;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link Client}.
@@ -28,10 +30,22 @@ public class ClientTest {
     String appkey = "validkey";
     int apiPort = 5784;
     String apiURL = "http://localhost:" + apiPort;
-    Client client = new Client(appkey, apiURL);
+    Client client;
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(apiPort);
+
+    @Before
+    public void setUp() {
+        client = new Client(appkey, apiURL);
+    }
+
+    @After
+    public void after() {
+        if (client != null) {
+            client.close();
+        }
+    }
 
     @Test
     public void getStatus() {
@@ -164,6 +178,22 @@ public class ClientTest {
             Item item = client.getItem("beef");
             assertThat(item.getIid(), is("beef"));
             assertThat(item.getItypes(), is(array(equalTo("foo"), equalTo("bar"))));
+        } catch (ExecutionException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void getItemRecTopNWithoutIdentity() {
+        try {
+            client.getItemRecTopN("greatengine", 5);
+            fail("Should have thrown UnidentifiedUserException");
+        } catch (UnidentifiedUserException e) {
+            // Expected
         } catch (ExecutionException e) {
             fail(e.getMessage());
         } catch (InterruptedException e) {
