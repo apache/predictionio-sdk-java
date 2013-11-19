@@ -42,8 +42,6 @@ public class Client implements Closeable {
     private String apiUrl;
     // Appkey
     private String appkey;
-    // Async HTTP client
-    private AsyncHttpClientConfig config;
     private AsyncHttpClient client;
 
     private JsonParser parser = new JsonParser();
@@ -89,14 +87,14 @@ public class Client implements Closeable {
         }
         this.setAppkey(appkey);
         // Async HTTP client config
-        this.config = (new AsyncHttpClientConfig.Builder())
-            .setAllowPoolingConnection(true)
-            .setAllowSslConnectionPool(true)
-            .addRequestFilter(new ThrottleRequestFilter(threadLimit))
-            .setMaximumConnectionsPerHost(threadLimit)
-            .setRequestTimeoutInMs(10000)
-            .setIOThreadMultiplier(threadLimit)
-            .build();
+        AsyncHttpClientConfig config = (new AsyncHttpClientConfig.Builder())
+                .setAllowPoolingConnection(true)
+                .setAllowSslConnectionPool(true)
+                .addRequestFilter(new ThrottleRequestFilter(threadLimit))
+                .setMaximumConnectionsPerHost(threadLimit)
+                .setRequestTimeoutInMs(10000)
+                .setIOThreadMultiplier(threadLimit)
+                .build();
         this.client = new AsyncHttpClient(new NettyAsyncHttpProvider(config), config);
     }
 
