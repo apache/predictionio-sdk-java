@@ -8,6 +8,7 @@ import com.ning.http.client.*;
 import com.ning.http.client.extra.ThrottleRequestFilter;
 import com.ning.http.client.providers.netty.NettyAsyncHttpProvider;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ import java.util.concurrent.ExecutionException;
  * @version 0.6.1
  * @since 0.1
  */
-public class Client {
+public class Client implements Closeable {
     // API base URL constant string
     private static final String defaultApiUrl = "http://localhost:8000";
     private static final String apiFormat = "json";
@@ -103,6 +104,7 @@ public class Client {
      * Close all connections associated with this client.
      * It is a good practice to always close the client after use.
      */
+    @Override
     public void close() {
         this.client.close();
     }
