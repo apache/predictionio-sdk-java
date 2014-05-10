@@ -318,6 +318,64 @@ public class ClientTest {
     }
 
     @Test
+    public void getItemRankRanked() {
+        String[] iids = {"foo", "bar", "dead", "beef", "baz"};
+        try {
+            client.identify("foo");
+            String[] items = client.getItemRankRanked("ranking", iids);
+            assertThat(items.length, is(5));
+            assertThat(items, is(array(equalTo("baz"), equalTo("bar"), equalTo("foo"), equalTo("beef"), equalTo("dead"))));
+        } catch (UnidentifiedUserException e) {
+            fail(e.getMessage());
+        } catch (ExecutionException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+
+        try {
+            String[] items = client.getItemRankRanked("ranking", "foo", iids);
+            assertThat(items.length, is(5));
+            assertThat(items, is(array(equalTo("baz"), equalTo("bar"), equalTo("foo"), equalTo("beef"), equalTo("dead"))));
+        } catch (ExecutionException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+
+        try {
+            client.identify("foo");
+            String[] items = client.getItemRankRanked(client.getItemRankGetRankedRequestBuilder("ranking", iids));
+            assertThat(items.length, is(5));
+            assertThat(items, is(array(equalTo("baz"), equalTo("bar"), equalTo("foo"), equalTo("beef"), equalTo("dead"))));
+        } catch (UnidentifiedUserException e) {
+            fail(e.getMessage());
+        } catch (ExecutionException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+
+        try {
+            String[] items = client.getItemRankRanked(client.getItemRankGetRankedRequestBuilder("ranking", "foo", iids));
+            assertThat(items.length, is(5));
+            assertThat(items, is(array(equalTo("baz"), equalTo("bar"), equalTo("foo"), equalTo("beef"), equalTo("dead"))));
+        } catch (ExecutionException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
     public void getItemSimTopN() {
         try {
             String[] items = client.getItemSimTopN("anothergreatengine", "foo", 5);

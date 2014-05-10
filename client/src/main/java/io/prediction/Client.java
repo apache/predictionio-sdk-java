@@ -885,6 +885,218 @@ public class Client implements Closeable {
     }
 
     /**
+     * Get a get item ranking request builder that can be used to add additional request parameters.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param uid ID of the User whose recommendations will be gotten
+     * @param iids IDs of Items to be ranked
+     */
+    public ItemRankGetRankedRequestBuilder getItemRankGetRankedRequestBuilder(String engine, String uid, String[] iids) {
+        return new ItemRankGetRankedRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, uid, iids);
+    }
+
+    /**
+     * Get a get item ranking request builder that can be used to add additional request parameters.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param iids IDs of Items to be ranked
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     */
+    public ItemRankGetRankedRequestBuilder getItemRankGetRankedRequestBuilder(String engine, String[] iids) throws UnidentifiedUserException {
+        if (this.uid == null) {
+            throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
+        }
+        return new ItemRankGetRankedRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, this.uid, iids);
+    }
+
+    /**
+     * Get a get item ranking request builder that can be used to add additional request parameters.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param uid ID of the User whose recommendations will be gotten
+     * @param iids IDs of Items to be ranked
+     * @param attributes array of item attribute names to be returned with the result
+     */
+    public ItemRankGetRankedRequestBuilder getItemRankGetRankedRequestBuilder(String engine, String uid, String[] iids, String[] attributes) {
+        return (new ItemRankGetRankedRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, uid, iids)).attributes(attributes);
+    }
+
+    /**
+     * Get a get item ranking request builder that can be used to add additional request parameters.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param iids IDs of Items to be ranked
+     * @param attributes array of item attribute names to be returned with the result
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     */
+    public ItemRankGetRankedRequestBuilder getItemRankGetRankedRequestBuilder(String engine, String[] iids, String[] attributes) throws UnidentifiedUserException {
+        if (this.uid == null) {
+            throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
+        }
+        return (new ItemRankGetRankedRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, this.uid, iids)).attributes(attributes);
+    }
+
+    /**
+     * Sends an asynchronous get ranking request to the API.
+     *
+     * @param builder an instance of {@link ItemRankGetRankedRequestBuilder} that will be turned into a request
+     */
+    public FutureAPIResponse getItemRankRankedAsFuture(ItemRankGetRankedRequestBuilder builder) throws IOException {
+        return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param uid ID of the User whose recommendations will be gotten
+     * @param iids IDs of Items to be ranked
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemRankRanked(String engine, String uid, String[] iids) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRanked(this.getItemRankRankedAsFuture(this.getItemRankGetRankedRequestBuilder(engine, uid, iids)));
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param iids IDs of Items to be ranked
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemRankRanked(String engine, String[] iids) throws UnidentifiedUserException, ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRanked(this.getItemRankRankedAsFuture(this.getItemRankGetRankedRequestBuilder(engine, iids)));
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     *
+     * @param builder an instance of {@link ItemRankGetRankedRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemRankRanked(ItemRankGetRankedRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRanked(this.getItemRankRankedAsFuture(builder));
+    }
+
+    /**
+     * Synchronize a previously sent asynchronous get ranking request.
+     *
+     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getItemRankRankedAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemRankRanked(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        // Do not use getStatus/getMessage directly as they do not pass exceptions
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
+
+        if (status == Client.HTTP_OK) {
+            JsonObject messageAsJson = (JsonObject) parser.parse(message);
+            JsonArray iidsAsJson = messageAsJson.getAsJsonArray("pio_iids");
+            return this.jsonArrayAsStringArray(iidsAsJson);
+        } else {
+            throw new IOException(message);
+        }
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param uid ID of the User whose recommendations will be gotten
+     * @param iids IDs of Items to be ranked
+     * @param attributes array of item attribute names to be returned with the result
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRankRankedWithAttributes(String engine, String uid, String[] iids, String[] attributes) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRankedWithAttributes(this.getItemRankRankedAsFuture(this.getItemRankGetRankedRequestBuilder(engine, uid, iids, attributes)));
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param iids IDs of Items to be ranked
+     * @param attributes array of item attribute names to be returned with the result
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRankRankedWithAttributes(String engine, String[] iids, String[] attributes) throws UnidentifiedUserException, ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRankedWithAttributes(this.getItemRankRankedAsFuture(this.getItemRankGetRankedRequestBuilder(engine, iids, attributes)));
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     *
+     * @param builder an instance of {@link ItemRankGetRankedRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRankRankedWithAttributes(ItemRankGetRankedRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRankedWithAttributes(this.getItemRankRankedAsFuture(builder));
+    }
+
+    /**
+     * Synchronize a previously sent asynchronous get ranking request.
+     *
+     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getItemRankRankedAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRankRankedWithAttributes(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        // Do not use getStatus/getMessage directly as they do not pass exceptions
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
+
+        if (status == Client.HTTP_OK) {
+            Map<String, String[]> results = new HashMap<String, String[]>();
+            JsonObject messageAsJson = (JsonObject) parser.parse(message);
+            for (Map.Entry<String, JsonElement> member : messageAsJson.entrySet()) {
+                results.put(member.getKey(), this.jsonArrayAsStringArray(member.getValue().getAsJsonArray()));
+            }
+            return results;
+        } else {
+            throw new IOException(message);
+        }
+    }
+
+    /**
      * Get a user-action-on-item request builder that can be used to add additional request parameters.
      *
      * Using this method overrides the user ID set by {@link Client#identify}.
