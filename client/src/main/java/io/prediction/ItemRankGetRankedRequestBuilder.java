@@ -4,7 +4,7 @@ import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 /**
- * Get top n recommendations request builder for item recommendation engine
+ * Get items' ranking request builder for item ranking engine
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
  * @version 0.7.0
@@ -30,7 +30,7 @@ public class ItemRankGetRankedRequestBuilder {
      * @param appkey the new app key to be used
      * @param engine engine name
      * @param uid UID
-     * @param n number of recommendations to return
+     * @param iids IDs of Items to be ranked
      *
      * @see Client#getItemRankGetRankedRequestBuilder
      */

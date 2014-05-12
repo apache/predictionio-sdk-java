@@ -1211,7 +1211,7 @@ public class Client implements Closeable {
     /**
      * Synchronize a previously sent asynchronous user-action-on-item request.
      *
-     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userRateItemAsFuture}
+     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userActionItemAsFuture}
      *
      * @throws ExecutionException indicates an error in the HTTP backend
      * @throws InterruptedException indicates an interruption during the HTTP operation
