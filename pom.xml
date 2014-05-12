@@ -1,87 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>io.prediction</groupId>
-    <artifactId>sdk</artifactId>
-    <version>0.6.2-SNAPSHOT</version>
-    <url>http://prediction.io</url>
-    <packaging>pom</packaging>
-    <name>PredictionIO Java SDK</name>
-    <description>The PredictionIO Java SDK includes an API client and sample code.</description>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.prediction</groupId>
+  <artifactId>sdk</artifactId>
+  <version>0.6.2-SNAPSHOT</version>
+  <url>http://prediction.io</url>
+  <packaging>pom</packaging>
+  <name>PredictionIO Java SDK</name>
+  <description>The PredictionIO Java SDK includes an API client and sample code.</description>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
-    <developers>
-        <developer>
-            <id>predictionio</id>
-            <name>The PredictionIO Team</name>
-            <email>support@prediction.io</email>
-        </developer>
-    </developers>
+  <developers>
+    <developer>
+      <id>predictionio</id>
+      <name>The PredictionIO Team</name>
+      <email>support@prediction.io</email>
+    </developer>
+  </developers>
 
-    <contributors>
-        <contributor>
-            <name>Cong Qin</name>
-            <email>Cong.Charlie.Qin@gmail.com</email>
-        </contributor>
-    </contributors>
+  <contributors>
+    <contributor>
+      <name>Cong Qin</name>
+      <email>Cong.Charlie.Qin@gmail.com</email>
+    </contributor>
+  </contributors>
 
-    <scm>
-        <connection>scm:git:git@github.com:PredictionIO/PredictionIO-Java-SDK.git</connection>
-        <developerConnection>scm:git:git@github.com:PredictionIO/PredictionIO-Java-SDK.git</developerConnection>
-        <url>git@github.com:PredictionIO/PredictionIO-Java-SDK.git</url>
-    </scm>
+  <scm>
+    <connection>scm:git:git@github.com:PredictionIO/PredictionIO-Java-SDK.git</connection>
+    <developerConnection>scm:git:git@github.com:PredictionIO/PredictionIO-Java-SDK.git</developerConnection>
+    <url>git@github.com:PredictionIO/PredictionIO-Java-SDK.git</url>
+  </scm>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <outputDirectory>${project.build.directory}</outputDirectory>
-    </properties>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <outputDirectory>${project.build.directory}</outputDirectory>
+  </properties>
 
-    <modules>
-        <module>client</module>
-    </modules>
+  <modules>
+    <module>client</module>
+  </modules>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.5.1</version>
-                    <configuration>
-                        <encoding>UTF-8</encoding>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>sign-artifacts</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>sign</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.5.1</version>
+          <configuration>
+            <encoding>UTF-8</encoding>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>
