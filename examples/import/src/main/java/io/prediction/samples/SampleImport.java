@@ -4,14 +4,14 @@ import io.prediction.Client;
 import io.prediction.FutureAPIResponse;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 /**
  * Sample data import client using MovieLens data set.
@@ -21,7 +21,7 @@ import java.util.StringTokenizer;
 public class SampleImport {
     public static void main(String[] args) {
     	/* set appurl to your API server */
-    	String appurl = "http://localhost:8000";
+        String appurl = "http://localhost:8000";
         /* Handle command line arguments */
         String appkey = null;
         String inputFile = null;
@@ -33,27 +33,29 @@ public class SampleImport {
             System.exit(1);
         }
 
-        /* Create a client with an app key */
-        Client client = new Client(appkey);
-
-        /* Data structure */
-        Set uids = new TreeSet<String>();
-        Set iids = new TreeSet<String>();
+        Client client = null;
+        Reader fileReader = null;
 
         /* Read input MovieLens data and send requests to API */
         try {
+            /* Create a client with an app key */
+            client = new Client(appkey, appurl);
+
+            /* Data structure */
+            Set<String> uids = new TreeSet<String>();
+            Set<String> iids = new TreeSet<String>();
+
             /* Get API status */
             System.out.println(client.getStatus());
 
             /* Open data file for reading */
-            FileInputStream fstream = new FileInputStream(inputFile);
-            DataInputStream dstream = new DataInputStream(fstream);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(dstream));
+            fileReader = new FileReader(inputFile);
+            BufferedReader reader = new BufferedReader(fileReader);
 
             /* Some local variables */
             String line;
             int i = 0;
-            ArrayList<FutureAPIResponse> rs = new ArrayList<FutureAPIResponse>();
+            List<FutureAPIResponse> rs = new ArrayList<FutureAPIResponse>();
 
             while ((line = reader.readLine()) != null) {
                 /* Break the line up */
@@ -74,19 +76,19 @@ public class SampleImport {
                 int j;
                 for (j=0; j<5; j++) {
                     FutureAPIResponse r;
- 
+
                     // create all types of actions for testing purpose
                     switch (j) {
-                        case 0: 
+                        case 0:
                             r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("view", iid));
                             break;
-                        case 1: 
+                        case 1:
                             r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("like", iid));
                             break;
-                        case 2: 
+                        case 2:
                             r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("dislike", iid));
                             break;
-                        case 3: 
+                        case 3:
                             r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("conversion", iid));
                             break;
                         default:
@@ -107,20 +109,16 @@ public class SampleImport {
 
             }
 
-            dstream.close();
-
             /* Add User and Item IDs asynchronously */
             System.out.println("Sending "+uids.size()+" create User ID requests");
-            for (Iterator uidIter = uids.iterator(); uidIter.hasNext();) {
-                String uid = (String)uidIter.next();
+            for (String uid : uids) {
                 rs.add(client.createUserAsFuture(client.getCreateUserRequestBuilder(uid)));
             }
 
             System.out.println("Sending "+iids.size()+" create Item ID requests");
             String[] itypes = {"movies"};
-            for (Iterator iidIter = iids.iterator(); iidIter.hasNext();) {
-                String iid = (String)iidIter.next();
-                rs.add(client.createItemAsFuture(client.getCreateItemRequestBuilder(iid, itypes).attribute("url", "http://localhost/"+iid+".html").attribute("startT", "ignored")));
+            for (String iid : iids) {
+                rs.add(client.createItemAsFuture(client.getCreateItemRequestBuilder(iid, itypes).attribute("url", "http://localhost/" + iid + ".html").attribute("startT", "ignored")));
             }
 
             /* Synchronize all requests before the program exits */
@@ -131,7 +129,18 @@ public class SampleImport {
             }
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (fileReader != null) {
+                try {
+                    fileReader.close();
+                } catch (IOException e) {
+                    System.err.println("Error: " + e.getMessage());
+                }
+            }
+            if (client != null) {
+                client.close();
+            }
         }
-        client.close();
     }
 }

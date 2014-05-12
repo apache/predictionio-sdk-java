@@ -1,21 +1,23 @@
 package io.prediction;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsArray.array;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsArray.array;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link Client}.
@@ -28,10 +30,22 @@ public class ClientTest {
     String appkey = "validkey";
     int apiPort = 5784;
     String apiURL = "http://localhost:" + apiPort;
-    Client client = new Client(appkey, apiURL);
+    Client client;
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(apiPort);
+
+    @Before
+    public void setUp() {
+        client = new Client(appkey, apiURL);
+    }
+
+    @After
+    public void after() {
+        if (client != null) {
+            client.close();
+        }
+    }
 
     @Test
     public void getStatus() {
@@ -174,6 +188,22 @@ public class ClientTest {
     }
 
     @Test
+    public void getItemRecTopNWithoutIdentity() {
+        try {
+            client.getItemRecTopN("greatengine", 5);
+            fail("Should have thrown UnidentifiedUserException");
+        } catch (UnidentifiedUserException e) {
+            // Expected
+        } catch (ExecutionException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
     public void getItemRecTopN() {
         try {
             client.identify("foo");
@@ -278,6 +308,64 @@ public class ClientTest {
             assertThat(items.get("pio_iids"), is(array(equalTo("baz"), equalTo("bar"), equalTo("foo"), equalTo("beef"), equalTo("dead"))));
             assertThat(items.get("cost"), is(array(equalTo("5"), equalTo("4"), equalTo("3"), equalTo("2"), equalTo("1"))));
             assertThat(items.get("price"), is(array(equalTo("6"), equalTo("5"), equalTo("4"), equalTo("3"), equalTo("2"))));
+        } catch (ExecutionException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void getItemRankRanked() {
+        String[] iids = {"foo", "bar", "dead", "beef", "baz"};
+        try {
+            client.identify("foo");
+            String[] items = client.getItemRankRanked("ranking", iids);
+            assertThat(items.length, is(5));
+            assertThat(items, is(array(equalTo("baz"), equalTo("bar"), equalTo("foo"), equalTo("beef"), equalTo("dead"))));
+        } catch (UnidentifiedUserException e) {
+            fail(e.getMessage());
+        } catch (ExecutionException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+
+        try {
+            String[] items = client.getItemRankRanked("ranking", "foo", iids);
+            assertThat(items.length, is(5));
+            assertThat(items, is(array(equalTo("baz"), equalTo("bar"), equalTo("foo"), equalTo("beef"), equalTo("dead"))));
+        } catch (ExecutionException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+
+        try {
+            client.identify("foo");
+            String[] items = client.getItemRankRanked(client.getItemRankGetRankedRequestBuilder("ranking", iids));
+            assertThat(items.length, is(5));
+            assertThat(items, is(array(equalTo("baz"), equalTo("bar"), equalTo("foo"), equalTo("beef"), equalTo("dead"))));
+        } catch (UnidentifiedUserException e) {
+            fail(e.getMessage());
+        } catch (ExecutionException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+
+        try {
+            String[] items = client.getItemRankRanked(client.getItemRankGetRankedRequestBuilder("ranking", "foo", iids));
+            assertThat(items.length, is(5));
+            assertThat(items, is(array(equalTo("baz"), equalTo("bar"), equalTo("foo"), equalTo("beef"), equalTo("dead"))));
         } catch (ExecutionException e) {
             fail(e.getMessage());
         } catch (InterruptedException e) {

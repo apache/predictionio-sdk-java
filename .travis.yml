@@ -1,0 +1,10 @@
+language: java
+jdk:
+  - oraclejdk7
+  - openjdk7
+  - openjdk6
+env:
+  - JAVA_OPTS=-Xmx1024m
+before_script:
+  - ulimit -n 64000
+  - ulimit -u 64000

@@ -65,11 +65,7 @@ public class UserActionItemRequestBuilder {
      * @param uid the user ID
      * @param iid the item ID
      *
-     * @see Client#getUserRateItemRequestBuilder
-     * @see Client#getUserLikeItemRequestBuilder
-     * @see Client#getUserDislikeItemRequestBuilder
-     * @see Client#getUserViewItemRequestBuilder
-     * @see Client#getUserConversionItemRequestBuilder
+     * @see Client#getUserActionItemRequestBuilder
      */
     public UserActionItemRequestBuilder(String apiUrl, String apiFormat, String appkey, String action, String uid, String iid) {
         this.apiUrl = apiUrl;
@@ -131,11 +127,7 @@ public class UserActionItemRequestBuilder {
      * <p>
      * Do not use this directly. Please refer to "See Also".
      *
-     * @see Client#userConversionItem(UserActionItemRequestBuilder)
-     * @see Client#userLikeItem(UserActionItemRequestBuilder)
-     * @see Client#userDislikeItem(UserActionItemRequestBuilder)
-     * @see Client#userRateItem(UserActionItemRequestBuilder)
-     * @see Client#userViewItem(UserActionItemRequestBuilder)
+     * @see Client#userActionItem(UserActionItemRequestBuilder)
      */
     public Request build() {
         RequestBuilder builder = new RequestBuilder("POST");
@@ -154,7 +146,7 @@ public class UserActionItemRequestBuilder {
 
         String actionUrl = "/actions/u2i.";
         requestJson.addProperty("pio_action", this.action);
-        if (this.action == RATE) {
+        if (RATE.equals(this.action)) {
             requestJson.addProperty("pio_rate", Integer.toString(this.rate));
         }
 

@@ -3,18 +3,16 @@ package io.prediction;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.ning.http.client.*;
 import com.ning.http.client.extra.ThrottleRequestFilter;
 import com.ning.http.client.providers.netty.NettyAsyncHttpProvider;
-import org.joda.time.DateTime;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -29,7 +27,7 @@ import java.util.concurrent.ExecutionException;
  * @version 0.6.1
  * @since 0.1
  */
-public class Client {
+public class Client implements Closeable {
     // API base URL constant string
     private static final String defaultApiUrl = "http://localhost:8000";
     private static final String apiFormat = "json";
@@ -44,14 +42,12 @@ public class Client {
     private String apiUrl;
     // Appkey
     private String appkey;
-    // Async HTTP client
-    private AsyncHttpClientConfig config;
     private AsyncHttpClient client;
 
     private JsonParser parser = new JsonParser();
 
     // internal field
-    private String uid = "";
+    private String uid = null;
 
     /**
      * Instantiate a PredictionIO RESTful API client using default values for API URL and thread limit.
@@ -91,14 +87,14 @@ public class Client {
         }
         this.setAppkey(appkey);
         // Async HTTP client config
-        this.config = (new AsyncHttpClientConfig.Builder())
-            .setAllowPoolingConnection(true)
-            .setAllowSslConnectionPool(true)
-            .addRequestFilter(new ThrottleRequestFilter(threadLimit))
-            .setMaximumConnectionsPerHost(threadLimit)
-            .setRequestTimeoutInMs(10000)
-            .setIOThreadMultiplier(threadLimit)
-            .build();
+        AsyncHttpClientConfig config = (new AsyncHttpClientConfig.Builder())
+                .setAllowPoolingConnection(true)
+                .setAllowSslConnectionPool(true)
+                .addRequestFilter(new ThrottleRequestFilter(threadLimit))
+                .setMaximumConnectionsPerHost(threadLimit)
+                .setRequestTimeoutInMs(10000)
+                .setIOThreadMultiplier(threadLimit)
+                .build();
         this.client = new AsyncHttpClient(new NettyAsyncHttpProvider(config), config);
     }
 
@@ -106,6 +102,7 @@ public class Client {
      * Close all connections associated with this client.
      * It is a good practice to always close the client after use.
      */
+    @Override
     public void close() {
         this.client.close();
     }
@@ -222,7 +219,7 @@ public class Client {
      * @param uid ID of the User to be created
      */
     public CreateUserRequestBuilder getCreateUserRequestBuilder(String uid) {
-        return new CreateUserRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, uid);
+        return new CreateUserRequestBuilder(this.apiUrl, apiFormat, this.appkey, uid);
     }
 
     /**
@@ -284,7 +281,7 @@ public class Client {
      * @param uid ID of the User to get
      */
     public FutureAPIResponse getUserAsFuture(String uid) throws IOException {
-        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/users/" + uid + "." + this.apiFormat).addQueryParameter("pio_appkey", this.appkey).build();
+        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/users/" + uid + "." + apiFormat).addQueryParameter("pio_appkey", this.appkey).build();
         return new FutureAPIResponse(this.client.executeRequest(request, this.getHandler()));
     }
 
@@ -336,7 +333,7 @@ public class Client {
      */
     public FutureAPIResponse deleteUserAsFuture(String uid) throws IOException {
         RequestBuilder builder = new RequestBuilder("DELETE");
-        builder.setUrl(this.apiUrl + "/users/" + uid + "." + this.apiFormat);
+        builder.setUrl(this.apiUrl + "/users/" + uid + "." + apiFormat);
         builder.addQueryParameter("pio_appkey", this.appkey);
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
@@ -379,7 +376,7 @@ public class Client {
      * @param itypes array of types of the Item
      */
     public CreateItemRequestBuilder getCreateItemRequestBuilder(String iid, String[] itypes) {
-        return new CreateItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, iid, itypes);
+        return new CreateItemRequestBuilder(this.apiUrl, apiFormat, this.appkey, iid, itypes);
     }
 
     /**
@@ -442,7 +439,7 @@ public class Client {
      * @param iid ID of the Item to get
      */
     public FutureAPIResponse getItemAsFuture(String iid) throws IOException {
-        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/items/" + iid + "." + this.apiFormat).addQueryParameter("pio_appkey", this.appkey).build();
+        Request request = (new RequestBuilder("GET")).setUrl(this.apiUrl + "/items/" + iid + "." + apiFormat).addQueryParameter("pio_appkey", this.appkey).build();
         return new FutureAPIResponse(this.client.executeRequest(request, this.getHandler()));
     }
 
@@ -501,7 +498,7 @@ public class Client {
      */
     public FutureAPIResponse deleteItemAsFuture(String iid) throws IOException {
         RequestBuilder builder = new RequestBuilder("DELETE");
-        builder.setUrl(this.apiUrl + "/items/" + iid + "." + this.apiFormat);
+        builder.setUrl(this.apiUrl + "/items/" + iid + "." + apiFormat);
         builder.addQueryParameter("pio_appkey", this.appkey);
         return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
     }
@@ -547,7 +544,7 @@ public class Client {
      * @param n number of top recommendations to get
      */
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, String uid, int n) {
-        return new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n);
+        return new ItemRecGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, uid, n);
     }
 
     /**
@@ -560,10 +557,10 @@ public class Client {
      * @throws UnidentifiedUserException indicates an unidentified user ID error
      */
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, int n) throws UnidentifiedUserException {
-        if (this.uid == "") {
+        if (this.uid == null) {
             throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
         }
-        return new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, this.uid, n);
+        return new ItemRecGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, this.uid, n);
     }
 
     /**
@@ -577,7 +574,7 @@ public class Client {
      * @param attributes array of item attribute names to be returned with the result
      */
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, String uid, int n, String[] attributes) {
-        return (new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, uid, n)).attributes(attributes);
+        return (new ItemRecGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, uid, n)).attributes(attributes);
     }
 
     /**
@@ -591,10 +588,10 @@ public class Client {
      * @throws UnidentifiedUserException indicates an unidentified user ID error
      */
     public ItemRecGetTopNRequestBuilder getItemRecGetTopNRequestBuilder(String engine, int n, String[] attributes) throws UnidentifiedUserException {
-        if (this.uid == "") {
+        if (this.uid == null) {
             throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
         }
-        return (new ItemRecGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, this.uid, n)).attributes(attributes);
+        return (new ItemRecGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, this.uid, n)).attributes(attributes);
     }
 
     /**
@@ -738,7 +735,7 @@ public class Client {
         String message = response.get().getMessage();
 
         if (status == Client.HTTP_OK) {
-            HashMap<String, String[]> results = new HashMap();
+            Map<String, String[]> results = new HashMap<String, String[]>();
             JsonObject messageAsJson = (JsonObject) parser.parse(message);
             for (Map.Entry<String, JsonElement> member : messageAsJson.entrySet()) {
                 results.put(member.getKey(), this.jsonArrayAsStringArray(member.getValue().getAsJsonArray()));
@@ -757,7 +754,7 @@ public class Client {
      * @param n number of top similar items to get
      */
     public ItemSimGetTopNRequestBuilder getItemSimGetTopNRequestBuilder(String engine, String iid, int n) {
-        return new ItemSimGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, iid, n);
+        return new ItemSimGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, iid, n);
     }
 
     /**
@@ -769,7 +766,7 @@ public class Client {
      * @param attributes array of item attribute names to be returned with the result
      */
     public ItemSimGetTopNRequestBuilder getItemSimGetTopNRequestBuilder(String engine, String iid, int n, String[] attributes) {
-        return new ItemSimGetTopNRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, engine, iid, n).attributes(attributes);
+        return new ItemSimGetTopNRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, iid, n).attributes(attributes);
     }
 
     /**
@@ -876,7 +873,219 @@ public class Client {
         String message = response.get().getMessage();
 
         if (status == Client.HTTP_OK) {
-            HashMap<String, String[]> results = new HashMap();
+            Map<String, String[]> results = new HashMap<String, String[]>();
+            JsonObject messageAsJson = (JsonObject) parser.parse(message);
+            for (Map.Entry<String, JsonElement> member : messageAsJson.entrySet()) {
+                results.put(member.getKey(), this.jsonArrayAsStringArray(member.getValue().getAsJsonArray()));
+            }
+            return results;
+        } else {
+            throw new IOException(message);
+        }
+    }
+
+    /**
+     * Get a get item ranking request builder that can be used to add additional request parameters.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param uid ID of the User whose recommendations will be gotten
+     * @param iids IDs of Items to be ranked
+     */
+    public ItemRankGetRankedRequestBuilder getItemRankGetRankedRequestBuilder(String engine, String uid, String[] iids) {
+        return new ItemRankGetRankedRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, uid, iids);
+    }
+
+    /**
+     * Get a get item ranking request builder that can be used to add additional request parameters.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param iids IDs of Items to be ranked
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     */
+    public ItemRankGetRankedRequestBuilder getItemRankGetRankedRequestBuilder(String engine, String[] iids) throws UnidentifiedUserException {
+        if (this.uid == null) {
+            throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
+        }
+        return new ItemRankGetRankedRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, this.uid, iids);
+    }
+
+    /**
+     * Get a get item ranking request builder that can be used to add additional request parameters.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param uid ID of the User whose recommendations will be gotten
+     * @param iids IDs of Items to be ranked
+     * @param attributes array of item attribute names to be returned with the result
+     */
+    public ItemRankGetRankedRequestBuilder getItemRankGetRankedRequestBuilder(String engine, String uid, String[] iids, String[] attributes) {
+        return (new ItemRankGetRankedRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, uid, iids)).attributes(attributes);
+    }
+
+    /**
+     * Get a get item ranking request builder that can be used to add additional request parameters.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param iids IDs of Items to be ranked
+     * @param attributes array of item attribute names to be returned with the result
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     */
+    public ItemRankGetRankedRequestBuilder getItemRankGetRankedRequestBuilder(String engine, String[] iids, String[] attributes) throws UnidentifiedUserException {
+        if (this.uid == null) {
+            throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
+        }
+        return (new ItemRankGetRankedRequestBuilder(this.apiUrl, apiFormat, this.appkey, engine, this.uid, iids)).attributes(attributes);
+    }
+
+    /**
+     * Sends an asynchronous get ranking request to the API.
+     *
+     * @param builder an instance of {@link ItemRankGetRankedRequestBuilder} that will be turned into a request
+     */
+    public FutureAPIResponse getItemRankRankedAsFuture(ItemRankGetRankedRequestBuilder builder) throws IOException {
+        return new FutureAPIResponse(this.client.executeRequest(builder.build(), this.getHandler()));
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param uid ID of the User whose recommendations will be gotten
+     * @param iids IDs of Items to be ranked
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemRankRanked(String engine, String uid, String[] iids) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRanked(this.getItemRankRankedAsFuture(this.getItemRankGetRankedRequestBuilder(engine, uid, iids)));
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param iids IDs of Items to be ranked
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemRankRanked(String engine, String[] iids) throws UnidentifiedUserException, ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRanked(this.getItemRankRankedAsFuture(this.getItemRankGetRankedRequestBuilder(engine, iids)));
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     *
+     * @param builder an instance of {@link ItemRankGetRankedRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemRankRanked(ItemRankGetRankedRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRanked(this.getItemRankRankedAsFuture(builder));
+    }
+
+    /**
+     * Synchronize a previously sent asynchronous get ranking request.
+     *
+     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getItemRankRankedAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public String[] getItemRankRanked(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        // Do not use getStatus/getMessage directly as they do not pass exceptions
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
+
+        if (status == Client.HTTP_OK) {
+            JsonObject messageAsJson = (JsonObject) parser.parse(message);
+            JsonArray iidsAsJson = messageAsJson.getAsJsonArray("pio_iids");
+            return this.jsonArrayAsStringArray(iidsAsJson);
+        } else {
+            throw new IOException(message);
+        }
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     *
+     * Using this method overrides the user ID set by {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param uid ID of the User whose recommendations will be gotten
+     * @param iids IDs of Items to be ranked
+     * @param attributes array of item attribute names to be returned with the result
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRankRankedWithAttributes(String engine, String uid, String[] iids, String[] attributes) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRankedWithAttributes(this.getItemRankRankedAsFuture(this.getItemRankGetRankedRequestBuilder(engine, uid, iids, attributes)));
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     * Identified user ID will be used. See {@link Client#identify}.
+     *
+     * @param engine engine name
+     * @param iids IDs of Items to be ranked
+     * @param attributes array of item attribute names to be returned with the result
+     *
+     * @throws UnidentifiedUserException indicates an unidentified user ID error
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRankRankedWithAttributes(String engine, String[] iids, String[] attributes) throws UnidentifiedUserException, ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRankedWithAttributes(this.getItemRankRankedAsFuture(this.getItemRankGetRankedRequestBuilder(engine, iids, attributes)));
+    }
+
+    /**
+     * Sends a synchronous get ranking request to the API.
+     *
+     * @param builder an instance of {@link ItemRankGetRankedRequestBuilder} that will be turned into a request
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRankRankedWithAttributes(ItemRankGetRankedRequestBuilder builder) throws ExecutionException, InterruptedException, IOException {
+        return this.getItemRankRankedWithAttributes(this.getItemRankRankedAsFuture(builder));
+    }
+
+    /**
+     * Synchronize a previously sent asynchronous get ranking request.
+     *
+     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#getItemRankRankedAsFuture}
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public Map<String, String[]> getItemRankRankedWithAttributes(FutureAPIResponse response) throws ExecutionException, InterruptedException, IOException {
+        // Do not use getStatus/getMessage directly as they do not pass exceptions
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
+
+        if (status == Client.HTTP_OK) {
+            Map<String, String[]> results = new HashMap<String, String[]>();
             JsonObject messageAsJson = (JsonObject) parser.parse(message);
             for (Map.Entry<String, JsonElement> member : messageAsJson.entrySet()) {
                 results.put(member.getKey(), this.jsonArrayAsStringArray(member.getValue().getAsJsonArray()));
@@ -897,7 +1106,7 @@ public class Client {
      * @param iid ID of the Item of this action
      */
     public UserActionItemRequestBuilder getUserActionItemRequestBuilder(String uid, String action, String iid) {
-        UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, action, uid, iid);
+        UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, apiFormat, this.appkey, action, uid, iid);
         return builder;
     }
 
@@ -911,10 +1120,10 @@ public class Client {
      * @throws UnidentifiedUserException indicates an unidentified user ID error
      */
     public UserActionItemRequestBuilder getUserActionItemRequestBuilder(String action, String iid) throws UnidentifiedUserException {
-        if (this.uid == "") {
+        if (this.uid == null) {
             throw new UnidentifiedUserException("User ID has not been identified. Please call identify(uid) first.");
         }
-        UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, this.apiFormat, this.appkey, action, this.uid, iid);
+        UserActionItemRequestBuilder builder = new UserActionItemRequestBuilder(this.apiUrl, apiFormat, this.appkey, action, this.uid, iid);
         return builder;
     }
 
@@ -1002,7 +1211,7 @@ public class Client {
     /**
      * Synchronize a previously sent asynchronous user-action-on-item request.
      *
-     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userRateItemAsFuture}
+     * @param response an instance of {@link FutureAPIResponse} returned from {@link Client#userActionItemAsFuture}
      *
      * @throws ExecutionException indicates an error in the HTTP backend
      * @throws InterruptedException indicates an interruption during the HTTP operation
