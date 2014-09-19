@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.prediction</groupId>
   <artifactId>sdk</artifactId>
-  <version>0.7.1-SNAPSHOT</version>
+  <version>0.8.0</version>
   <url>http://prediction.io</url>
   <packaging>pom</packaging>
   <name>PredictionIO Java SDK</name>
@@ -14,6 +14,14 @@
     <artifactId>oss-parent</artifactId>
     <version>7</version>
   </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>18.0</version>
+    </dependency>
+  </dependencies>
 
   <licenses>
     <license>
@@ -70,11 +78,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.5.1</version>
+        <version>3.0</version>
         <configuration>
           <encoding>UTF-8</encoding>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
         </configuration>
       </plugin>
       <plugin>

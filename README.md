@@ -18,7 +18,7 @@ If you have a Maven project, simply add the dependency to your `pom.xml`.
         <dependency>
             <groupId>io.prediction</groupId>
             <artifactId>client</artifactId>
-            <version>0.6.2-SNAPSHOT</version>
+            <version>0.8.0</version>
         </dependency>
     </dependencies>
     ...
@@ -34,7 +34,7 @@ If you use Ivy, simply add the dependency to your `ivy.xml`.
 <ivy-module ...>
     ...
     <dependencies>
-        <dependency org="io.prediction" name="client" rev="0.6.2-SNAPSHOT" />
+        <dependency org="io.prediction" name="client" rev="0.8.0" />
         ...
     </dependencies>
     ...
@@ -47,7 +47,7 @@ sbt
 If you have an sbt project, add the library dependency to your build definition.
 
 ```Scala
-libraryDependencies += "io.prediction" % "client" % "0.6.2-SNAPSHOT"
+libraryDependencies += "io.prediction" % "client" % "0.8.0"
 ```
 
 
@@ -91,28 +91,24 @@ git clone git://github.com/PredictionIO/PredictionIO-Java-SDK.git
 ```
 
 
-Running the Sample Android Client
----------------------------------
-
-Detailed instructions can be found at our
-[main documentation site](http://docs.prediction.io/current/tutorials/android-client.html).
-
-
 Running CLI Examples
 --------------------
 
 
 ### Building
 
-If your PredictionIO server is not at localhost, edit the source and replace API URLs with your PredictionIO server host.
+If your PredictionIO server is not at localhost, edit the source and replace
+API URLs with your PredictionIO server host.
 
 To build these examples you will need Maven 3+.
 Run the following in each example's directory, e.g.
 
 ```sh
-cd ~/PredictionIO-Java-SDK/examples/import
+cd ~/PredictionIO-Java-SDK/examples/quickstart_import
 mvn clean compile assembly:single
-cd ~/PredictionIO-Java-SDK/examples/simpletasks1
+cd ~/PredictionIO-Java-SDK/examples/quickstart_show
+mvn clean compile assembly:single
+cd ~/PredictionIO-Java-SDK/examples/import
 mvn clean compile assembly:single
 ```
 
@@ -121,22 +117,19 @@ These will create JAR files with all dependencies built in.
 
 ### Try It Now
 
-First, you need to create an Application on PredictionIO and obtain an appkey.
+For running the quick start example (quickstart_import and quickstart_show),
+please refer to the "Quick Start" page of the PredictionIO documentation.
 
-To import the provided small sample data:
+To import the provided small sample data for the import example using asynchronous calls:
 
 ```sh
 cd ~/PredictionIO-Java-SDK/examples/import
-java -jar target/sample-import-<latest version>.jar <your appkey here> sampledata/sample1.txt 
+java -jar target/sample-import-<latest version>-jar-with-dependencies.jar <your appId here> sampledata/sample1.txt
 ```
 
-You will then have to create an engine and make sure that it's up and running. It may take an hour for the prediction results to be generated.  
-
-Then, you can run the sample client of various tasks:
-
+To check the data is imported properly, run
 ```sh
-cd ~/PredictionIO-Java-SDK/examples/simpletasks1
-java -jar target/sample-client-<latest version>-jar-with-dependencies.jar <your appkey here> <your engine name here>
+curl -i -X GET http://localhost:7070/events.json?appId=<your appId here>
 ```
 
 Enjoy!
