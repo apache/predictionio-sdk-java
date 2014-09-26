@@ -38,7 +38,7 @@ public class QuickstartImport {
             for (int i = 1; i <= 10; i++) {
                 int item = rand.nextInt(50) + 1;
                 System.out.println("User " + user + " views item " + item);
-                client.userActionItem(""+user, "view", ""+item, new HashMap<String, Object>());
+                client.userActionItem("view", ""+user, ""+item, new HashMap<String, Object>());
             }
         }
 

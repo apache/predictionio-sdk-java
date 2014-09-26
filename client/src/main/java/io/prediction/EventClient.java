@@ -540,13 +540,13 @@ public class EventClient extends BaseClient {
     /**
      * Sends a user-action-on-item request.
      *
-     * @param uid ID of the user
      * @param action name of the action performed
+     * @param uid ID of the user
      * @param iid ID of the item
      * @param properties a map of properties associated with this action
      * @param eventTime timestamp of the event
      */
-    public FutureAPIResponse userActionItemAsFuture(String uid, String action, String iid,
+    public FutureAPIResponse userActionItemAsFuture(String action, String uid, String iid,
             Map<String, Object> properties, DateTime eventTime) throws IOException {
         return createEventAsFuture(new Event()
             .appId(appId)
@@ -565,25 +565,25 @@ public class EventClient extends BaseClient {
      * #userActionItemAsFuture(String, String, String, Map&lt;String, Object\gt;, DateTime)}
      * except event time is not specified and recorded as the time when the function is called.
      */
-    public FutureAPIResponse userActionItemAsFuture(String uid, String action, String iid,
+    public FutureAPIResponse userActionItemAsFuture(String action, String uid, String iid,
             Map<String, Object> properties) throws IOException {
-        return userActionItemAsFuture(uid, action, iid, properties, new DateTime());
+        return userActionItemAsFuture(action, uid, iid, properties, new DateTime());
     }
 
     /**
      * Records a user-action-on-item event.
      *
-     * @param uid ID of the user
      * @param action name of the action performed
+     * @param uid ID of the user
      * @param iid ID of the item
      * @param properties a map of properties associated with this action
      * @param eventTime timestamp of the event
      * @return ID of this event
      */
-    public String userActionItem(String uid, String action, String iid,
+    public String userActionItem(String action, String uid, String iid,
             Map<String, Object> properties, DateTime eventTime)
             throws ExecutionException, InterruptedException, IOException {
-        return createEvent(userActionItemAsFuture(uid, action, iid, properties, eventTime));
+        return createEvent(userActionItemAsFuture(action, uid, iid, properties, eventTime));
     }
 
     /**
@@ -592,10 +592,10 @@ public class EventClient extends BaseClient {
      * userActionItem(String, String, String, Map&lt;String, Object&gt;, DateTime)}
      * except event time is not specified and recorded as the time when the function is called.
      */
-    public String userActionItem(String uid, String action, String iid,
+    public String userActionItem(String action, String uid, String iid,
             Map<String, Object> properties)
             throws ExecutionException, InterruptedException, IOException {
-        return userActionItem(uid, action, iid, properties, new DateTime());
+        return userActionItem(action, uid, iid, properties, new DateTime());
     }
 
 }

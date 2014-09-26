@@ -96,7 +96,7 @@ public class SampleImport {
                 /* User rates the movie. We do this asynchronously */
                 Map<String, Object> properties = new HashMap(); // properties with rating
                 properties.put("pio_rating", rate);
-                future = client.userActionItemAsFuture(uid, "rate", iid, properties);
+                future = client.userActionItemAsFuture("rate", uid, iid, properties);
                 listOfFutures.add(future);
                 Futures.addCallback(future.getAPIResponse(), getFutureCallback("event " + uid + " rates " + iid + " with " + rate));
             }
