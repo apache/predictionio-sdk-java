@@ -61,9 +61,9 @@ public class SampleImport {
             /* Some local variables */
             String line;
             int i = 0;
-            List<FutureAPIResponse> listOfFutures = new ArrayList(); // keeping track of requests
+            List<FutureAPIResponse> listOfFutures = new ArrayList<>(); // keeping track of requests
             FutureAPIResponse future;
-            Map<String, Object> userProperties = new HashMap(); // empty properties for user
+            Map<String, Object> userProperties = new HashMap<>(); // empty properties for user
 
             while ((line = reader.readLine()) != null) {
                 /* Break the line up */
@@ -82,9 +82,9 @@ public class SampleImport {
                     Futures.addCallback(future.getAPIResponse(), getFutureCallback("user " + uid));
                 }
                 if (iids.add(iid)) {
-                    Map<String, Object> itemProperties = new HashMap();
+                    Map<String, Object> itemProperties = new HashMap<>();
                     // in case of movielens data, pio_itypes could be used to store genres
-                    List<String> itypes = new ArrayList();
+                    List<String> itypes = new ArrayList<>();
                     itypes.add("movie");
                     itemProperties.put("pio_itypes", itypes);
                     future = client.setItemAsFuture(iid, itemProperties);
@@ -94,7 +94,7 @@ public class SampleImport {
                 }
 
                 /* User rates the movie. We do this asynchronously */
-                Map<String, Object> properties = new HashMap(); // properties with rating
+                Map<String, Object> properties = new HashMap<>(); // properties with rating
                 properties.put("pio_rating", rate);
                 future = client.userActionItemAsFuture("rate", uid, iid, properties);
                 listOfFutures.add(future);

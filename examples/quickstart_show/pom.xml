@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.prediction.samples</groupId>
-    <artifactId>quickstart-import</artifactId>
+    <artifactId>quickstart-show</artifactId>
     <version>0.8.0</version>
     <packaging>jar</packaging>
     <name>PredictionIO Java SDK Examples: Quickstart Show</name>
