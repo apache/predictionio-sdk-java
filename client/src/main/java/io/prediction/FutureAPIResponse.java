@@ -1,24 +1,37 @@
 package io.prediction;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.ning.http.client.extra.ListenableFutureAdapter;
+
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * APIResponse as a future.
+ * APIResponse as a listenable future.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.2
+ * @version 0.8.0
  * @since 0.2
  */
 
-public class FutureAPIResponse implements Future {
-    private Future<APIResponse> apiResponse;
+public class FutureAPIResponse implements ListenableFuture<APIResponse> {
 
-    public FutureAPIResponse(Future<APIResponse> apiResponse) {
-        this.apiResponse = apiResponse;
+    private ListenableFuture<APIResponse> apiResponse;
+
+    public FutureAPIResponse(com.ning.http.client.ListenableFuture<APIResponse> apiResponse) {
+        this.apiResponse = ListenableFutureAdapter.asGuavaFuture(apiResponse);
     }
+
+    // implements ListenableFuture<APIResponse>
+
+    public void addListener(Runnable listener, Executor executor) {
+        this.apiResponse.addListener(listener, executor);
+    }
+
+    // implements Future<APIResponse>
 
     public boolean cancel(boolean mayInterruptIfRunning) {
         return this.apiResponse.cancel(mayInterruptIfRunning);
@@ -38,6 +51,11 @@ public class FutureAPIResponse implements Future {
 
     public boolean isDone() {
         return this.apiResponse.isDone();
+    }
+
+    public ListenableFuture<APIResponse> getAPIResponse() {
+        // get the underlying APIResponse
+        return this.apiResponse;
     }
 
     public int getStatus() {

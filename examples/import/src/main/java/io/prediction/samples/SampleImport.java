@@ -1,6 +1,10 @@
 package io.prediction.samples;
 
-import io.prediction.Client;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+
+import io.prediction.APIResponse;
+import io.prediction.EventClient;
 import io.prediction.FutureAPIResponse;
 
 import java.io.BufferedReader;
@@ -8,7 +12,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -16,30 +22,30 @@ import java.util.TreeSet;
 /**
  * Sample data import client using MovieLens data set.
  *
- * @author Cong Qin, Donald Szeto
+ * @author Cong Qin, Donald Szeto, Tom Chan
  */
 public class SampleImport {
     public static void main(String[] args) {
     	/* set appurl to your API server */
-        String appurl = "http://localhost:8000";
+        String appurl = "http://localhost:7070";
         /* Handle command line arguments */
-        String appkey = null;
+        int appId = -1;
         String inputFile = null;
         try {
-            appkey = args[0];
+            appId = Integer.parseInt(args[0]);
             inputFile = args[1];
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.err.println("You must provide appkey (1st arg) and input file name (2nd arg)");
+            System.err.println("You must provide appId (1st arg) and input file name (2nd arg)");
             System.exit(1);
         }
 
-        Client client = null;
+        EventClient client = null;
         Reader fileReader = null;
 
         /* Read input MovieLens data and send requests to API */
         try {
-            /* Create a client with an app key */
-            client = new Client(appkey, appurl);
+            /* Create a client with an appId */
+            client = new EventClient(appId, appurl);
 
             /* Data structure */
             Set<String> uids = new TreeSet<String>();
@@ -55,7 +61,9 @@ public class SampleImport {
             /* Some local variables */
             String line;
             int i = 0;
-            List<FutureAPIResponse> rs = new ArrayList<FutureAPIResponse>();
+            List<FutureAPIResponse> listOfFutures = new ArrayList<>(); // keeping track of requests
+            FutureAPIResponse future;
+            Map<String, Object> userProperties = new HashMap<>(); // empty properties for user
 
             while ((line = reader.readLine()) != null) {
                 /* Break the line up */
@@ -66,66 +74,31 @@ public class SampleImport {
                 String iid = st.nextToken();
                 int rate = Integer.parseInt(st.nextToken());
 
-                /* Save User IDs and Item IDs for adding later */
-                uids.add(uid);
-                iids.add(iid);
-
-                /* Send out async request */
-                client.identify(uid);
-
-                int j;
-                for (j=0; j<5; j++) {
-                    FutureAPIResponse r;
-
-                    // create all types of actions for testing purpose
-                    switch (j) {
-                        case 0:
-                            r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("view", iid));
-                            break;
-                        case 1:
-                            r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("like", iid));
-                            break;
-                        case 2:
-                            r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("dislike", iid));
-                            break;
-                        case 3:
-                            r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("conversion", iid));
-                            break;
-                        default:
-                            r = client.userActionItemAsFuture(client.getUserActionItemRequestBuilder("rate", iid).rate(rate));
-                            break;
-                    }
-                    
-                    /* Add async handler to array for synchronization later */
-                    rs.add(r);
-                    i++;
-
-                    /* Print status per 2000 requests */
-                    if (i % 2000 == 0) {
-                        System.out.println("Sent "+i+" requests so far");
-                    }
-
+                /* Add user and item if they are not seen before */
+                if (uids.add(uid)) {
+                    // event time is omitted since we're not using it
+                    future = client.setUserAsFuture(uid, userProperties);
+                    listOfFutures.add(future);
+                    Futures.addCallback(future.getAPIResponse(), getFutureCallback("user " + uid));
+                }
+                if (iids.add(iid)) {
+                    Map<String, Object> itemProperties = new HashMap<>();
+                    // in case of movielens data, pio_itypes could be used to store genres
+                    List<String> itypes = new ArrayList<>();
+                    itypes.add("movie");
+                    itemProperties.put("pio_itypes", itypes);
+                    future = client.setItemAsFuture(iid, itemProperties);
+                    listOfFutures.add(future);
+                    final String name = "item";
+                    Futures.addCallback(future.getAPIResponse(), getFutureCallback("item " + iid));
                 }
 
-            }
-
-            /* Add User and Item IDs asynchronously */
-            System.out.println("Sending "+uids.size()+" create User ID requests");
-            for (String uid : uids) {
-                rs.add(client.createUserAsFuture(client.getCreateUserRequestBuilder(uid)));
-            }
-
-            System.out.println("Sending "+iids.size()+" create Item ID requests");
-            String[] itypes = {"movies"};
-            for (String iid : iids) {
-                rs.add(client.createItemAsFuture(client.getCreateItemRequestBuilder(iid, itypes).attribute("url", "http://localhost/" + iid + ".html").attribute("startT", "ignored")));
-            }
-
-            /* Synchronize all requests before the program exits */
-            for (FutureAPIResponse r : rs) {
-                if (r.getStatus() != 201) {
-                    System.err.println(r.getMessage());
-                }
+                /* User rates the movie. We do this asynchronously */
+                Map<String, Object> properties = new HashMap<>(); // properties with rating
+                properties.put("pio_rating", rate);
+                future = client.userActionItemAsFuture("rate", uid, iid, properties);
+                listOfFutures.add(future);
+                Futures.addCallback(future.getAPIResponse(), getFutureCallback("event " + uid + " rates " + iid + " with " + rate));
             }
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
@@ -142,5 +115,16 @@ public class SampleImport {
                 client.close();
             }
         }
+    }
+
+    private static FutureCallback<APIResponse> getFutureCallback(final String name) {
+        return new FutureCallback<APIResponse>() {
+            public void onSuccess(APIResponse response) {
+                System.out.println(name + " added: " + response.getMessage());
+            }
+            public void onFailure(Throwable thrown) {
+                System.out.println("failed to add " + name + ": " + thrown.getMessage());
+            }
+        };
     }
 }
