@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.prediction.samples</groupId>
     <artifactId>quickstart-show</artifactId>
-    <version>0.8.0</version>
+    <version>0.8.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>PredictionIO Java SDK Examples: Quickstart Show</name>
 
@@ -11,7 +11,7 @@
         <dependency>
             <groupId>io.prediction</groupId>
             <artifactId>client</artifactId>
-            <version>0.8.0</version>
+            <version>0.8.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
