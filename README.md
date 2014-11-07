@@ -5,6 +5,7 @@ PredictionIO Java SDK
 Getting Started
 ===============
 
+Please refer to the master branch unless you are modifying the SDK code.
 
 By Maven
 --------
