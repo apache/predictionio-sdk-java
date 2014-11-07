@@ -1,14 +1,15 @@
 PredictionIO Java SDK
 =====================
 
+This bulk of this README is divided into two sections: Using the SDK and Developing the SDK.
+Choose the one the suits you. For Support please see the bottom of this README.
 
-Getting Started
-===============
+Using the SDK
+=============
 
-Please refer to the master branch unless you are modifying the SDK code.
 
-By Maven
---------
+With Maven
+----------
 
 If you have a Maven project, simply add the dependency to your `pom.xml`.
 
@@ -19,15 +20,15 @@ If you have a Maven project, simply add the dependency to your `pom.xml`.
         <dependency>
             <groupId>io.prediction</groupId>
             <artifactId>client</artifactId>
-            <version>0.8.1-SNAPSHOT</version>
+            <version>0.8.0</version>
         </dependency>
     </dependencies>
     ...
 ```
 
 
-By Ivy
-------
+With Ivy
+--------
 
 If you use Ivy, simply add the dependency to your `ivy.xml`.
 
@@ -35,25 +36,31 @@ If you use Ivy, simply add the dependency to your `ivy.xml`.
 <ivy-module ...>
     ...
     <dependencies>
-        <dependency org="io.prediction" name="client" rev="0.8.1-SNAPSHOT" />
+        <dependency org="io.prediction" name="client" rev="0.8.0" />
         ...
     </dependencies>
     ...
 ```
 
 
-sbt
----
+With sbt
+--------
 
 If you have an sbt project, add the library dependency to your build definition.
 
 ```Scala
-libraryDependencies += "io.prediction" % "client" % "0.8.1-SNAPSHOT"
+libraryDependencies += "io.prediction" % "client" % "0.8.0"
 ```
 
 
-Building from Source
---------------------
+Examples
+--------
+
+Please check out the examples under `examples/`.
+
+
+Developing SDK - Building from Source
+=====================================
 
 Assuming you are cloning to your home directory.
 
@@ -74,21 +81,6 @@ Run the following to generate API documentation.
 ```sh
 cd ~/PredictionIO-Java-SDK
 mvn clean javadoc:javadoc
-```
-
-
-Examples
-========
-
-
-Download Source
----------------
-
-If you have not already cloned the repository from the section above, do
-
-```sh
-cd ~
-git clone git://github.com/PredictionIO/PredictionIO-Java-SDK.git
 ```
 
 
