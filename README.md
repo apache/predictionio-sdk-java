@@ -83,6 +83,24 @@ cd ~/PredictionIO-Java-SDK
 mvn clean javadoc:javadoc
 ```
 
+Using the Published Module with Maven
+-------------------------------------
+
+Simply add the dependency to your `pom.xml`.
+
+```XML
+<project ...>
+    ...
+    <dependencies>
+        <dependency>
+            <groupId>io.prediction</groupId>
+            <artifactId>client</artifactId>
+            <version>0.8.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+    ...
+```
+
 
 Running CLI Examples
 --------------------
