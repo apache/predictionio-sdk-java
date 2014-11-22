@@ -13,7 +13,14 @@ import java.util.concurrent.ExecutionException;
 public class QuickstartImport {
     public static void main(String[] args)
             throws ExecutionException, InterruptedException, IOException {
-        EventClient client = new EventClient(10101);
+        String accessKey = null;
+        try {
+            accessKey = args[0];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("You must provide access key as the parameter");
+            System.exit(1);
+        }
+        EventClient client = new EventClient(accessKey);
         Random rand = new Random();
         Map<String, Object> emptyProperty = ImmutableMap.of();
 
@@ -24,12 +31,9 @@ public class QuickstartImport {
         }
 
         // generate 50 items, with item ids 1 to 50
-        // assign type id 1 to all of them
-        Map<String, Object> itemProperty = ImmutableMap.<String, Object>of(
-                "pio_itypes", ImmutableList.of("1"));
         for (int item = 1; item <= 50; item++) {
             System.out.println("Add item " + item);
-            client.setItem(""+item, itemProperty);
+            client.setItem(""+item, emptyProperty);
         }
 
         // each user randomly views 10 items

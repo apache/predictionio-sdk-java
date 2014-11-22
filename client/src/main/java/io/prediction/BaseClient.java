@@ -19,11 +19,10 @@ import java.util.concurrent.ExecutionException;
  * BaseClient contains code common to both {@link EventClient} and {@link EngineClient}.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.8.0
+ * @version 0.8.2
  * @since 0.1
  */
 public abstract class BaseClient implements Closeable {
-    private static final String apiFormat = "json";
     private static final int defaultThreadLimit = 1;
     private static final String defaultApiVersion = "";
     private static final int defaultQSize = 0;

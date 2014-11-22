@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
  * for sending queries.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.8.0
+ * @version 0.8.2
  * @since 0.8.0
  */
 public class EngineClient extends BaseClient {
