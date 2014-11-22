@@ -25,13 +25,13 @@ import java.util.concurrent.ExecutionException;
  *
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.8.0
+ * @version 0.8.2
  * @since 0.8.0
  */
 public class EventClient extends BaseClient {
     private static final String defaultEventUrl = "http://localhost:7070";
 
-    private final int appId;
+    private final String accessKey;
 
     /**
      * Instantiate a PredictionIO RESTful API Event Client using default values for API URL
@@ -39,63 +39,63 @@ public class EventClient extends BaseClient {
      * <p>
      * The default API URL is http://localhost:7070.
      *
-     * @param appId the app ID that this client will use to communicate with the API
+     * @param accessKey the access key that this client will use to communicate with the API
      */
-    public EventClient(int appId) {
-      this(appId, defaultEventUrl);
+    public EventClient(String accessKey) {
+      this(accessKey, defaultEventUrl);
     }
 
     /**
      * Instantiate a PredictionIO RESTful API Event Client using default values in
      * {@link BaseClient}.
      *
-     * @param appId the app ID that this client will use to communicate with the API
+     * @param accessKey the access key that this client will use to communicate with the API
      * @param eventURL the URL of the PredictionIO API
      */
-    public EventClient(int appId, String eventURL) {
+    public EventClient(String accessKey, String eventURL) {
         super(eventURL);
-        this.appId = appId;
+        this.accessKey = accessKey;
     }
 
     /**
      * Instantiate a PredictionIO RESTful API Event Client using default values in
      * {@link BaseClient} for parameters that are not specified.
      *
-     * @param appId the app ID that this client will use to communicate with the API
+     * @param accessKey the access key that this client will use to communicate with the API
      * @param eventURL the URL of the PredictionIO API
      * @param threadLimit maximum number of simultaneous threads (connections) to the API
      */
-    public EventClient(int appId, String eventURL, int threadLimit) {
+    public EventClient(String accessKey, String eventURL, int threadLimit) {
         super(eventURL, threadLimit);
-        this.appId = appId;
+        this.accessKey = accessKey;
     }
 
     /**
      * Instantiate a PredictionIO RESTful API Event Client using default values in
      * {@link BaseClient} for parameters that are not specified.
      *
-     * @param appId the app ID that this client will use to communicate with the API
+     * @param accessKey the access key that this client will use to communicate with the API
      * @param eventURL the URL of the PredictionIO API
      * @param threadLimit maximum number of simultaneous threads (connections) to the API
      * @param qSize size of the queue
      */
-    public EventClient(int appId, String eventURL, int threadLimit, int qSize) {
+    public EventClient(String accessKey, String eventURL, int threadLimit, int qSize) {
         super(eventURL, threadLimit, qSize);
-        this.appId = appId;
+        this.accessKey = accessKey;
     }
 
     /**
      * Instantiate a PredictionIO RESTful API Event Client.
      *
-     * @param appId the app ID that this client will use to communicate with the API
+     * @param accessKey the access key that this client will use to communicate with the API
      * @param eventURL the URL of the PredictionIO API
      * @param threadLimit maximum number of simultaneous threads (connections) to the API
      * @param qSize size of the queue
      * @param timeout timeout in seconds for the connections
      */
-    public EventClient(int appId, String eventURL, int threadLimit, int qSize, int timeout) {
+    public EventClient(String accessKey, String eventURL, int threadLimit, int qSize, int timeout) {
         super(eventURL, threadLimit, qSize, timeout);
-        this.appId = appId;
+        this.accessKey = accessKey;
     }
 
     /**
@@ -105,9 +105,8 @@ public class EventClient extends BaseClient {
      */
     public FutureAPIResponse createEventAsFuture(Event event) throws IOException {
         RequestBuilder builder = new RequestBuilder("POST");
-        builder.setUrl(apiUrl + "/events.json");
-        // use the appId associated with the client instead of the one specified in event
-        String requestJsonString = event.appId(this.appId).toJsonString();
+        builder.setUrl(apiUrl + "/events.json?accessKey=" + accessKey);
+        String requestJsonString = event.toJsonString();
         builder.setBody(requestJsonString);
         builder.setHeader("Content-Type","application/json");
         builder.setHeader("Content-Length", ""+requestJsonString.length());
@@ -157,7 +156,8 @@ public class EventClient extends BaseClient {
      * @param eid ID of the event to get
      */
     public FutureAPIResponse getEventAsFuture(String eid) throws IOException {
-        Request request = (new RequestBuilder("GET")).setUrl(apiUrl + "/events/" + eid + ".json")
+        Request request = (new RequestBuilder("GET"))
+            .setUrl(apiUrl + "/events/" + eid + ".json?accessKey=" + accessKey)
             .build();
         return new FutureAPIResponse(client.executeRequest(request, getHandler()));
     }
@@ -221,7 +221,6 @@ public class EventClient extends BaseClient {
     public FutureAPIResponse setUserAsFuture(String uid, Map<String, Object> properties,
             DateTime eventTime) throws IOException {
         return createEventAsFuture(new Event()
-            .appId(appId)
             .event("$set")
             .entityType("pio_user")
             .entityId(uid)
@@ -281,7 +280,6 @@ public class EventClient extends BaseClient {
             propertiesMap.put(property, "");
         }
         return createEventAsFuture(new Event()
-            .appId(appId)
             .event("$unset")
             .entityType("pio_user")
             .entityId(uid)
@@ -332,7 +330,6 @@ public class EventClient extends BaseClient {
     public FutureAPIResponse deleteUserAsFuture(String uid, DateTime eventTime)
             throws IOException {
         return createEventAsFuture(new Event()
-            .appId(appId)
             .event("$delete")
             .entityType("pio_user")
             .entityId(uid)
@@ -385,7 +382,6 @@ public class EventClient extends BaseClient {
     public FutureAPIResponse setItemAsFuture(String iid, Map<String, Object> properties,
             DateTime eventTime) throws IOException {
         return createEventAsFuture(new Event()
-            .appId(appId)
             .event("$set")
             .entityType("pio_item")
             .entityId(iid)
@@ -446,7 +442,6 @@ public class EventClient extends BaseClient {
             propertiesMap.put(property, "");
         }
         return createEventAsFuture(new Event()
-            .appId(appId)
             .event("$unset")
             .entityType("pio_item")
             .entityId(iid)
@@ -497,7 +492,6 @@ public class EventClient extends BaseClient {
     public FutureAPIResponse deleteItemAsFuture(String iid, DateTime eventTime)
             throws IOException {
         return createEventAsFuture(new Event()
-            .appId(appId)
             .event("$delete")
             .entityType("pio_item")
             .entityId(iid)
@@ -549,7 +543,6 @@ public class EventClient extends BaseClient {
     public FutureAPIResponse userActionItemAsFuture(String action, String uid, String iid,
             Map<String, Object> properties, DateTime eventTime) throws IOException {
         return createEventAsFuture(new Event()
-            .appId(appId)
             .event(action)
             .entityType("pio_user")
             .entityId(uid)

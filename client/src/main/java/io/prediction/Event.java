@@ -14,14 +14,13 @@ import java.util.Map;
  * Event class for PredictionIO Event objects.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.8.0
+ * @version 0.8.2
  * @since 0.8.0
  */
 
 public class Event {
 
     // mandatory fields
-    private int appId;
     private String event;
     private String entityType;
     private String entityId;
@@ -36,13 +35,6 @@ public class Event {
      * Instantiate an event object.
      */
     public Event() {
-    }
-
-    /**
-     * Returns the appId.
-     */
-    public int getAppId() {
-        return appId;
     }
 
     /**
@@ -95,14 +87,6 @@ public class Event {
     }
 
     // builder methods for convenience
-
-    /**
-     * Sets the appId. Called by EventClient.
-     */
-    protected Event appId(int appId) {
-        this.appId = appId;
-        return this;
-    }
 
     /**
      * Sets the name of the event.

@@ -4,7 +4,7 @@ package io.prediction;
  * API Response class for wrapping responses.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.2
+ * @version 0.8.2
  * @since 0.2
  */
 

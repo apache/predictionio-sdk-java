@@ -2,6 +2,7 @@ package io.prediction.samples;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import io.prediction.APIResponse;
 import io.prediction.EventClient;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Sample data import client using MovieLens data set.
@@ -25,17 +27,19 @@ import java.util.TreeSet;
  * @author Cong Qin, Donald Szeto, Tom Chan
  */
 public class SampleImport {
+    private static final int HTTP_CREATED = 201;
+
     public static void main(String[] args) {
     	/* set appurl to your API server */
         String appurl = "http://localhost:7070";
         /* Handle command line arguments */
-        int appId = -1;
+        String accessKey = null;
         String inputFile = null;
         try {
-            appId = Integer.parseInt(args[0]);
+            accessKey = args[0];
             inputFile = args[1];
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.err.println("You must provide appId (1st arg) and input file name (2nd arg)");
+            System.err.println("You must provide access key (1st arg) and input file name (2nd arg)");
             System.exit(1);
         }
 
@@ -43,9 +47,10 @@ public class SampleImport {
         Reader fileReader = null;
 
         /* Read input MovieLens data and send requests to API */
+        List<FutureAPIResponse> listOfFutures = new ArrayList<>(); // keeping track of requests
         try {
-            /* Create a client with an appId */
-            client = new EventClient(appId, appurl);
+            /* Create a client with the access key */
+            client = new EventClient(accessKey, appurl);
 
             /* Data structure */
             Set<String> uids = new TreeSet<String>();
@@ -61,7 +66,6 @@ public class SampleImport {
             /* Some local variables */
             String line;
             int i = 0;
-            List<FutureAPIResponse> listOfFutures = new ArrayList<>(); // keeping track of requests
             FutureAPIResponse future;
             Map<String, Object> userProperties = new HashMap<>(); // empty properties for user
 
@@ -83,19 +87,17 @@ public class SampleImport {
                 }
                 if (iids.add(iid)) {
                     Map<String, Object> itemProperties = new HashMap<>();
-                    // in case of movielens data, pio_itypes could be used to store genres
-                    List<String> itypes = new ArrayList<>();
-                    itypes.add("movie");
-                    itemProperties.put("pio_itypes", itypes);
+                    List<String> genre = new ArrayList<>();
+                    genre.add("comedy");
+                    itemProperties.put("genre", genre);
                     future = client.setItemAsFuture(iid, itemProperties);
                     listOfFutures.add(future);
-                    final String name = "item";
                     Futures.addCallback(future.getAPIResponse(), getFutureCallback("item " + iid));
                 }
 
                 /* User rates the movie. We do this asynchronously */
                 Map<String, Object> properties = new HashMap<>(); // properties with rating
-                properties.put("pio_rating", rate);
+                properties.put("rating", rate);
                 future = client.userActionItemAsFuture("rate", uid, iid, properties);
                 listOfFutures.add(future);
                 Futures.addCallback(future.getAPIResponse(), getFutureCallback("event " + uid + " rates " + iid + " with " + rate));
@@ -110,6 +112,21 @@ public class SampleImport {
                 } catch (IOException e) {
                     System.err.println("Error: " + e.getMessage());
                 }
+            }
+            // wait for the import result
+            ListenableFuture<List<APIResponse>> futures = Futures.allAsList(listOfFutures);
+            try {
+              List<APIResponse> responses = futures.get();
+              for (APIResponse response : responses) {
+                  if (response.getStatus() != HTTP_CREATED) {
+                      System.err.println("Error importing some record, first error message is: "
+                          + response.getMessage());
+                      // only print the first error
+                      break;
+                  }
+              }
+            } catch (InterruptedException | ExecutionException e) {
+              System.err.println("Error importing some record, error message: " + e.getStackTrace());
             }
             if (client != null) {
                 client.close();
