@@ -14,7 +14,7 @@ import java.util.Map;
  * Event class for PredictionIO Event objects.
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.8.2
+ * @version 0.8.3
  * @since 0.8.0
  */
 
