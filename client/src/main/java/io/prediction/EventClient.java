@@ -18,14 +18,14 @@ import java.util.concurrent.ExecutionException;
 /**
  * EventClient contains the generic methods createEvent() and getEvent() for importing and
  * accessing events, as well as helper methods such as setUser(), unsetItem() and userActionItem()
- * for integrating with built-in engines. Methods with an "AsFuture" suffix are asynchronous.
+ * for convenience. Methods with an "AsFuture" suffix are asynchronous.
  * <p>
  * Multiple simultaneous asynchronous requests is made possible by the high performance backend
  * provided by the <a href="https://github.com/AsyncHttpClient/async-http-client">Async Http Client</a>.
  *
  *
  * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
- * @version 0.8.2
+ * @version 0.8.3
  * @since 0.8.0
  */
 public class EventClient extends BaseClient {
@@ -203,11 +203,11 @@ public class EventClient extends BaseClient {
         }
     }
 
-    //////////////////////////////////////////////////
+    ////////////////////////////////////
     //
-    //  helper methods for use with built-in engines
+    //  helper methods for convenience
     //
-    //////////////////////////////////////////////////
+    ////////////////////////////////////
 
     /**
      * Sends a set user properties request. Implicitly creates the user if it's not already there.
@@ -222,7 +222,7 @@ public class EventClient extends BaseClient {
             DateTime eventTime) throws IOException {
         return createEventAsFuture(new Event()
             .event("$set")
-            .entityType("pio_user")
+            .entityType("user")
             .entityId(uid)
             .eventTime(eventTime)
             .properties(properties));
@@ -281,7 +281,7 @@ public class EventClient extends BaseClient {
         }
         return createEventAsFuture(new Event()
             .event("$unset")
-            .entityType("pio_user")
+            .entityType("user")
             .entityId(uid)
             .eventTime(eventTime)
             .properties(propertiesMap));
@@ -331,7 +331,7 @@ public class EventClient extends BaseClient {
             throws IOException {
         return createEventAsFuture(new Event()
             .event("$delete")
-            .entityType("pio_user")
+            .entityType("user")
             .entityId(uid)
             .eventTime(eventTime));
     }
@@ -383,7 +383,7 @@ public class EventClient extends BaseClient {
             DateTime eventTime) throws IOException {
         return createEventAsFuture(new Event()
             .event("$set")
-            .entityType("pio_item")
+            .entityType("item")
             .entityId(iid)
             .eventTime(eventTime)
             .properties(properties));
@@ -443,7 +443,7 @@ public class EventClient extends BaseClient {
         }
         return createEventAsFuture(new Event()
             .event("$unset")
-            .entityType("pio_item")
+            .entityType("item")
             .entityId(iid)
             .eventTime(eventTime)
             .properties(propertiesMap));
@@ -493,7 +493,7 @@ public class EventClient extends BaseClient {
             throws IOException {
         return createEventAsFuture(new Event()
             .event("$delete")
-            .entityType("pio_item")
+            .entityType("item")
             .entityId(iid)
             .eventTime(eventTime));
     }
@@ -544,9 +544,9 @@ public class EventClient extends BaseClient {
             Map<String, Object> properties, DateTime eventTime) throws IOException {
         return createEventAsFuture(new Event()
             .event(action)
-            .entityType("pio_user")
+            .entityType("user")
             .entityId(uid)
-            .targetEntityType("pio_item")
+            .targetEntityType("item")
             .targetEntityId(iid)
             .properties(properties)
             .eventTime(eventTime));
