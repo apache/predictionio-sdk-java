@@ -20,7 +20,7 @@ If you have a Maven project, simply add the dependency to your `pom.xml`.
         <dependency>
             <groupId>io.prediction</groupId>
             <artifactId>client</artifactId>
-            <version>0.8.3</version>
+            <version>0.9.5</version>
         </dependency>
     </dependencies>
     ...
@@ -36,7 +36,7 @@ If you use Ivy, simply add the dependency to your `ivy.xml`.
 <ivy-module ...>
     ...
     <dependencies>
-        <dependency org="io.prediction" name="client" rev="0.8.3" />
+        <dependency org="io.prediction" name="client" rev="0.9.5" />
         ...
     </dependencies>
     ...
@@ -49,7 +49,7 @@ With sbt
 If you have an sbt project, add the library dependency to your build definition.
 
 ```Scala
-libraryDependencies += "io.prediction" % "client" % "0.8.3"
+libraryDependencies += "io.prediction" % "client" % "0.9.5"
 ```
 
 
@@ -95,7 +95,7 @@ Simply add the dependency to your `pom.xml`.
         <dependency>
             <groupId>io.prediction</groupId>
             <artifactId>client</artifactId>
-            <version>0.8.4-SNAPSHOT</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
     </dependencies>
     ...
