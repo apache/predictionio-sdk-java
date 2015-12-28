@@ -9,6 +9,12 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
+import java.util.List;
+import java.util.LinkedList;
+import org.joda.time.DateTime;
+
+import io.prediction.Event;
+
 
 public class QuickstartImport {
     public static void main(String[] args)
@@ -44,6 +50,27 @@ public class QuickstartImport {
                 client.userActionItem("view", ""+user, ""+item, emptyProperty);
             }
         }
+
+        List<Event> events = new LinkedList<Event>();
+     
+        // Use only 5 users because max batch size is 50
+        // Throws IOException w/ details inside if this is exceeded
+        for (int user = 1; user <= 5; user++) {
+            for (int i = 1; i <= 10; i++) {
+                int item = rand.nextInt(50) + 1;
+                System.out.println("User " + user + " views item " + item);
+                events.add(new Event()
+            .event("view")
+            .entityType("user")
+            .entityId(""+user)
+            .targetEntityType("item")
+            .targetEntityId(""+item)
+            .properties(emptyProperty)
+            .eventTime(new DateTime()));
+            }
+        }
+    
+        client.createEvents(events);
 
         client.close();
     }

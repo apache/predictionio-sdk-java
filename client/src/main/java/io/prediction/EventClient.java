@@ -5,6 +5,8 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonArray;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
@@ -12,6 +14,7 @@ import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -148,6 +151,68 @@ public class EventClient extends BaseClient {
             throw new IOException(status + " " + message);
         }
         return ((JsonObject) parser.parse(message)).get("eventId").getAsString();
+    }
+
+    /**
+     * Sends an asynchronous create events (batch) request to the API.
+     *
+     * @param events a List of {@link Event} that will be turned into a request
+     */
+    public FutureAPIResponse createEventsAsFuture(List<Event> events) throws IOException {
+        RequestBuilder builder = new RequestBuilder("POST");
+        builder.setUrl(apiUrl + "/batch/events.json?accessKey=" + accessKey);
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeAdapter());
+        Gson gson = gsonBuilder.create();
+        String requestJsonString = gson.toJson(events);
+
+        builder.setBody(requestJsonString);
+        builder.setHeader("Content-Type","application/json");
+        builder.setHeader("Content-Length", ""+requestJsonString.length());
+        return new FutureAPIResponse(client.executeRequest(builder.build(), getHandler()));
+    }
+
+    /**
+     * Sends a synchronous create events (batch) request to the API.
+     *
+     * @param events a List of {@link Event} that will be turned into a request
+     * @return event ID from the server
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public List<String> createEvents(List<Event> event)
+            throws ExecutionException, InterruptedException, IOException {
+        return createEvents(createEventsAsFuture(event));
+    }
+
+    /**
+     * Synchronize a previously sent asynchronous create events (batch) request.
+     *
+     * @param response an instance of {@link FutureAPIResponse} returned from
+     * {@link #createEventAsFuture}
+     * @return List of event IDs from the server
+     *
+     * @throws ExecutionException indicates an error in the HTTP backend
+     * @throws InterruptedException indicates an interruption during the HTTP operation
+     * @throws IOException indicates an error from the API response
+     */
+    public List<String> createEvents(FutureAPIResponse response)
+            throws ExecutionException, InterruptedException, IOException {
+        int status = response.get().getStatus();
+        String message = response.get().getMessage();
+
+        if (status != BaseClient.HTTP_OK) {
+            throw new IOException(status + " " + message);
+        }
+       List<String> eventIds = new LinkedList<String>();
+ 
+       for(JsonElement elem: (JsonArray)parser.parse(message) ){
+           eventIds.add(((JsonObject)elem).get("eventId").getAsString());
+       }
+       return eventIds;
     }
 
     /**
