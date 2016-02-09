@@ -73,11 +73,11 @@ public abstract class BaseClient implements Closeable {
         this.apiUrl = apiURL;
         // Async HTTP client config
         AsyncHttpClientConfig config = (new AsyncHttpClientConfig.Builder())
-                .setAllowPoolingConnection(true)
-                .setAllowSslConnectionPool(true)
+                .setAllowPoolingConnections(true)
+                .setAllowPoolingSslConnections(true)
                 .addRequestFilter(new ThrottleRequestFilter(threadLimit))
-                .setMaximumConnectionsPerHost(threadLimit)
-                .setRequestTimeoutInMs(timeout * 1000)
+                .setMaxConnectionsPerHost(threadLimit)
+                .setRequestTimeout(timeout * 1000)
                 .setIOThreadMultiplier(threadLimit)
                 .build();
         this.client = new AsyncHttpClient(new NettyAsyncHttpProvider(config), config);
