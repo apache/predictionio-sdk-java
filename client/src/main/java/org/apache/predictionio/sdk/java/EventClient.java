@@ -1,6 +1,22 @@
-package io.prediction;
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import com.google.common.collect.Lists;
+package org.apache.predictionio.sdk.java;
+
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,7 +43,6 @@ import java.util.concurrent.ExecutionException;
  * provided by the <a href="https://github.com/AsyncHttpClient/async-http-client">Async Http Client</a>.
  *
  *
- * @author The PredictionIO Team (<a href="http://prediction.io">http://prediction.io</a>)
  * @version 0.8.3
  * @since 0.8.0
  */
@@ -147,7 +162,7 @@ public class EventClient extends BaseClient {
         int status = response.get().getStatus();
         String message = response.get().getMessage();
 
-        if (status != BaseClient.HTTP_CREATED) {
+        if (status != HTTP_CREATED) {
             throw new IOException(status + " " + message);
         }
         return ((JsonObject) parser.parse(message)).get("eventId").getAsString();
@@ -183,9 +198,9 @@ public class EventClient extends BaseClient {
      * @throws InterruptedException indicates an interruption during the HTTP operation
      * @throws IOException indicates an error from the API response
      */
-    public List<String> createEvents(List<Event> event)
+    public List<String> createEvents(List<Event> events)
             throws ExecutionException, InterruptedException, IOException {
-        return createEvents(createEventsAsFuture(event));
+        return createEvents(createEventsAsFuture(events));
     }
 
     /**
@@ -204,7 +219,7 @@ public class EventClient extends BaseClient {
         int status = response.get().getStatus();
         String message = response.get().getMessage();
 
-        if (status != BaseClient.HTTP_OK) {
+        if (status != HTTP_OK) {
             throw new IOException(status + " " + message);
         }
        List<String> eventIds = new LinkedList<String>();
@@ -256,7 +271,7 @@ public class EventClient extends BaseClient {
         int status = response.get().getStatus();
         String message = response.get().getMessage();
 
-        if (status == BaseClient.HTTP_OK) {
+        if (status == HTTP_OK) {
             // handle DateTime separately
             GsonBuilder gsonBuilder = new GsonBuilder();
             gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeAdapter());
