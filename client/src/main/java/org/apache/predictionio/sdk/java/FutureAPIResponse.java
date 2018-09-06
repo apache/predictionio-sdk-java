@@ -76,9 +76,7 @@ public class FutureAPIResponse implements ListenableFuture<APIResponse> {
     public int getStatus() {
         try {
             return this.apiResponse.get().getStatus();
-        } catch (InterruptedException e) {
-            return 0;
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             return 0;
         }
     }
@@ -86,9 +84,7 @@ public class FutureAPIResponse implements ListenableFuture<APIResponse> {
     public String getMessage() {
         try {
             return this.apiResponse.get().getMessage();
-        } catch (InterruptedException e) {
-            return e.getMessage();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             return e.getMessage();
         }
     }
