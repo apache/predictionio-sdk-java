@@ -25,27 +25,28 @@ package org.apache.predictionio.sdk.java;
  */
 
 public class APIResponse {
-    private int status;
-    private String message;
 
-    public APIResponse(int status, String message) {
-        this.status = status;
-        this.message = message;
-    }
+  private int status;
+  private String message;
 
-    public int getStatus() {
-        return this.status;
-    }
+  public APIResponse(int status, String message) {
+    this.status = status;
+    this.message = message;
+  }
 
-    public void setStatus(int status) {
-        this.status = status;
-    }
+  public int getStatus() {
+    return this.status;
+  }
 
-    public String getMessage() {
-        return this.message;
-    }
+  public void setStatus(int status) {
+    this.status = status;
+  }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+  public String getMessage() {
+    return this.message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
 }
