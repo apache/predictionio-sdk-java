@@ -1,19 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one or more
+contributor license agreements.  See the NOTICE file distributed with
+this work for additional information regarding copyright ownership.
+The ASF licenses this file to You under the Apache License, Version 2.0
+(the "License"); you may not use this file except in compliance with
+the License.  You may obtain a copy of the License at
+   http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>io.prediction</groupId>
-  <artifactId>sdk</artifactId>
-  <version>0.9.6-SNAPSHOT</version>
-  <url>http://prediction.io</url>
+  <groupId>org.apache.predictionio</groupId>
+  <artifactId>predictionio-sdk-java</artifactId>
+  <version>0.13.0-SNAPSHOT</version>
+  <url>http://predictionio.apache.org</url>
   <packaging>pom</packaging>
-  <name>PredictionIO Java SDK</name>
-  <description>The PredictionIO Java SDK includes an API client and sample code.</description>
+  <name>Apache PredictionIO Java SDK</name>
+  <description>The Apache PredictionIO Java SDK includes an API client and sample code.</description>
 
   <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
+    <groupId>org.apache</groupId>
+    <artifactId>apache</artifactId>
+    <version>21</version>
   </parent>
+
+  <scm>
+    <connection>scm:git:https://github.com/apache/predictionio-sdk-java</connection>
+    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/predictionio-sdk-java.git</developerConnection>
+    <url>https://github.com/apache/predictionio-sdk-java</url>
+  </scm>
 
   <dependencies>
     <dependency>
@@ -23,22 +45,6 @@
     </dependency>
   </dependencies>
 
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
-  <developers>
-    <developer>
-      <id>predictionio</id>
-      <name>The PredictionIO Team</name>
-      <email>support@prediction.io</email>
-    </developer>
-  </developers>
-
   <contributors>
     <contributor>
       <name>Cong Qin</name>
@@ -46,69 +52,71 @@
     </contributor>
   </contributors>
 
-  <scm>
-    <connection>scm:git:git@github.com:PredictionIO/PredictionIO-Java-SDK.git</connection>
-    <developerConnection>scm:git:git@github.com:PredictionIO/PredictionIO-Java-SDK.git</developerConnection>
-    <url>git@github.com:PredictionIO/PredictionIO-Java-SDK.git</url>
-  </scm>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <outputDirectory>${project.build.directory}</outputDirectory>
+    <project.root>${project.basedir}</project.root>
   </properties>
 
   <modules>
     <module>client</module>
   </modules>
 
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
-
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.0</version>
-        <configuration>
-          <encoding>UTF-8</encoding>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.0.0</version>
         <executions>
           <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
+            <id>validate</id>
+            <phase>validate</phase>
+            <configuration>
+              <configLocation>google_checks.xml</configLocation>
+              <encoding>UTF-8</encoding>
+              <consoleOutput>true</consoleOutput>
+              <failsOnError>true</failsOnError>
+              <linkXRef>false</linkXRef>
+            </configuration>
             <goals>
-              <goal>sign</goal>
+              <goal>check</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6</version>
-        <extensions>true</extensions>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <version>3.0.5</version>
+        <executions>
+          <execution>
+            <id>validate</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>0.12</version>
         <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <excludesFile>${project.root}/.rat-excludes</excludesFile>
         </configuration>
+        <executions>
+          <execution>
+            <id>validate</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
-
 </project>
