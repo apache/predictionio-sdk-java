@@ -16,17 +16,17 @@ limitations under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.prediction.samples</groupId>
+    <groupId>org.apache.predictionio.samples</groupId>
     <artifactId>quickstart-import</artifactId>
-    <version>0.9.5</version>
+    <version>0.13.0</version>
     <packaging>jar</packaging>
     <name>PredictionIO Java SDK Examples: Quickstart Import</name>
 
     <dependencies>
         <dependency>
-            <groupId>io.prediction</groupId>
+            <groupId>org.apache.predictionio</groupId>
             <artifactId>client</artifactId>
-            <version>0.9.5</version>
+            <version>0.13.0</version>
         </dependency>
     </dependencies>
 
@@ -67,7 +67,7 @@ limitations under the License.
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>io.prediction.samples.QuickstartImport</mainClass>
+                            <mainClass>org.apache.predictionio.samples.QuickstartImport</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
