@@ -32,9 +32,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
-import org.apache.predictionio.APIResponse;
-import org.apache.predictionio.EventClient;
-import org.apache.predictionio.FutureAPIResponse;
+import org.apache.predictionio.sdk.java.APIResponse;
+import org.apache.predictionio.sdk.java.EventClient;
+import org.apache.predictionio.sdk.java.FutureAPIResponse;
 
 /**
  * Sample data import client using MovieLens data set.

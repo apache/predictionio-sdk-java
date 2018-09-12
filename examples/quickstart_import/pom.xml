@@ -25,7 +25,7 @@ limitations under the License.
     <dependencies>
         <dependency>
             <groupId>org.apache.predictionio</groupId>
-            <artifactId>client</artifactId>
+            <artifactId>predictionio-sdk-java-client</artifactId>
             <version>0.13.0</version>
         </dependency>
     </dependencies>

@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
-import org.apache.predictionio.Event;
-import org.apache.predictionio.EventClient;
+import org.apache.predictionio.sdk.java.Event;
+import org.apache.predictionio.sdk.java.EventClient;
 import org.joda.time.DateTime;
 
 
